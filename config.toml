@@ -1,6 +1,6 @@
 # The URL the site will be built for
 base_url = "https://kafkiansky.github.io"
-title = "kafkiansky.blog"
+title = "kafkiansky.dev"
 
 # The site theme to use.
 theme = "adidoks"
