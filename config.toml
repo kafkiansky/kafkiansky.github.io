@@ -96,9 +96,6 @@ site_links_search_box = false
 
 # Menu items
 [[extra.menu.main]]
-name = "Статьи"
-section = ""
-url = "/"
 
 
 [[extra.menu.social]]
