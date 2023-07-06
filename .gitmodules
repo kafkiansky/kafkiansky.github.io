@@ -1,3 +1,9 @@
 [submodule "themes/adidoks"]
 	path = themes/adidoks
 	url = https://github.com/aaranxu/adidoks.git
+[submodule "syntaxes/inspired-github"]
+	path = syntaxes/inspired-github
+	url = https://github.com/sethlopezme/InspiredGitHub.tmtheme
+[submodule "syntaxes/github-sublime"]
+	path = syntaxes/github-sublime
+	url = https://github.com/AlexanderEkdahl/github-sublime-theme
