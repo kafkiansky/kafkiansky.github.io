@@ -478,6 +478,294 @@ if ($node->isNotEmpty()) {
 
 В данном случае тип поля `$name` остался прежним – `string`, – но благодаря аннотации мы доказали статанализатору, что границы типа были проверены.
 
+### Дженерики 
+
+Говорят, если произнести слово «дженерики», вас обязательно спросят, когда они появятся в PHP. А они есть. Причём в том виде, в котором они есть в других языках, — статическом.
+В компилируемых языках дженериков также не существует в рантайме, так как они стираются компилятором и заменяются на реальные типы.
+Заменяем компилятор на статанализатор и получаем то же самое – те же возможности и гарантии.
+
+Я не буду показывать пример с коллекциями – **hello, world** из мира дженериков, – а вместо этого давайте попробуем реализовать тип `Option` из **Rust**.
+
+`Option` – это супертип для типов `Some<T>` и `None`, который вынуждает вас явно обрабатывать отсутствие значения в отличие от `null`, способному привести к
+<a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/" target="_blank">неприятным последствиям</a>.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @template T 
+ */
+abstract class Option
+{
+    /**
+     * @return T
+     */
+    abstract public function unwrap(): mixed;
+}
+
+/**
+ * @template T
+ * @template-extends Option<T>
+ */
+final class Some extends Option
+{
+    /**
+     * @psalm-pure
+     * @internal 
+     *
+     * @param T $value
+     */
+    public function __construct(
+        private readonly mixed $value,
+    ) {
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function unwrap(): mixed
+    {
+        return $this->value;
+    }
+}
+
+/**
+ * @template T
+ * @template-extends Option<T>
+ */
+final class None extends Option
+{
+    /**
+     * @psalm-pure
+     * @internal 
+     */
+    public function __construct()
+    {
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function unwrap(): never
+    {
+        throw new \RuntimeException('None unwrapped.');
+    }
+}
+```
+
+На данный момент мы имеем простой тип, который пока еще не сильно лучше `nullable` типа, потому что тоже бросает исключение. Добавим сахара:
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @template T 
+ */
+abstract class Option
+{
+    /**
+     * @psalm-pure
+     * @template E
+     * @psalm-param E $value
+     *
+     * @return Some<E>
+     */
+    final public static function some(mixed $value): Some
+    {
+        return new Some($value);
+    }
+
+   /**
+     * @psalm-pure
+     * @template E
+     *
+     * @return None<E>
+     */
+    final public static function none(): None
+    {
+        return new None();
+    }
+
+    /**
+     * @psalm-assert-if-true T $this->unwrap()
+     * @psalm-this-out Some<T>
+     */
+    final public function isSome(): bool
+    {
+        return $this instanceof Some;
+    }
+
+    /**
+     * @psalm-this-out None<T>
+     */
+    final public function isNone(): bool
+    {
+        return $this instanceof None;
+    }
+
+    /**
+     * @psalm-if-this-is Some<T>
+     * @return T
+     */
+    abstract public function unwrap(): mixed;
+}
+```
+
+Теперь такой код не будет пропущен статанализатором:
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @return Option<positive-int>
+ */
+function doRequest(): Option
+{
+    return Option::some(200);
+}
+
+$option = doRequest();
+echo $option->unwrap(); // ERROR: IfThisIsMismatch - 139:16 - Class type must be Some<T:Option as mixed> current type Option<int<1, max>>
+```
+
+Дело в том, что теперь метод `unwrap` можно вызывать только на типе `Some<T>`, а на данном этапе типом переменной `$option` является тип `Option<positive-int>`,
+что не соответствует ограничениям аннотации `@psalm-if-this-is Some<T>`. Чтобы вызвать метод `unwrap` без ошибок от статанализитора, вам необходимо проверить, что в `Option` лежит действительно `Some<T>`:
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @return Option<positive-int>
+ */
+function doRequest(): Option
+{
+    return Option::some(200);
+}
+
+$option = doRequest();
+if ($option->isSome()) {
+	echo $option->unwrap() > 200;
+}
+```
+
+Когда вы вызываете метод `isSome`, тип объекта с `Option<T>` сужается до `Some<T>`, благодаря аннотации `@psalm-this-out Some<T>`.
+
+Также вы не можете вызывать метод `unwrap`, если `isNone()` будет утвердительным:
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @return Option<positive-int>
+ */
+function doRequest(): Option
+{
+    return Option::some(200);
+}
+
+$option = doRequest();
+if ($option->isNone()) {
+	echo $option->unwrap(); // ERROR: NoValue - 140:7 - All possible types for this argument were invalidated - This may be dead code
+}
+```
+
+Таким образом, вы либо явно проверяете, что значение существует, и используете его, либо явно затыкаете статанализатор.
+Оба варианта если и не избавляют от багов полностью (в конце концов, вы можете обмануть статанализатор аннотациями), то по крайней мере заставляют
+вас подумать о том, что вы делаете. 
+
+Добавим еще немного методов:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @template T 
+ */
+abstract class Option
+{
+    ...
+
+    /**
+     * @param callable(T): bool $f
+     */
+    final public function isSomeAnd(callable $f): bool
+    {
+        return $this->isSome() ? $f($this->unwrap()) : false; 
+    }
+
+    /**
+     * @template Te
+     * @psalm-param \Closure(T): Te       $onSome
+     * @psalm-param (\Closure(): Te)|null $onNone
+     *
+     * @psalm-return ($onNone is null ? Option<T> : Some<T>)
+     */
+    abstract public function map(\Closure $onSome, ?\Closure $onNone = null): Option;
+}
+
+/**
+ * @template T
+ * @template-extends Option<T>
+ */
+final class None extends Option
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function map(\Closure $onSome, ?\Closure $onNone = null): Option
+    {
+        return null !== $onNone ? self::some($onNone()) : self::none();
+    }
+}
+
+/**
+ * @template T
+ * @template-extends Option<T>
+ */
+final class Some extends Option
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function map(\Closure $onSome, ?\Closure $onNone = null): Option
+    {
+        return self::some($onSome($this->value));
+    }
+}
+
+...
+
+$option = doRequest();
+
+$another = $option->map(fn (int $code): string => (string) $code);
+if ($another->isSome()) {
+    echo $another->unwrap(); // OK
+}
+
+if ($option->isSomeAnd(fn (int $code): bool => $code > 200)) {
+    echo 'Ok'; // OK
+}
+
+echo 200 < $option
+    ->map(
+        fn (int $code): string => (string) $code,
+        fn (): int => 500,
+    )
+    ->unwrap(); // OK
+```
+
+Обратите внимание, что на последнем выражении мы можем вызывать `unwrap` сразу же, без проверки на `isSome`. Это доступно благодаря условным возвращаемым типам, а именно аннотации `@psalm-return ($onNone is null ? Option<T> : Some<T>)`,
+которая говорит, что, если мы никак не обработали тип `None`, то вернется базовый тип `Option<T>`, в обратном случае всегда вернется `Some<T>`.
+Таким образом мы получили мощный тип на основе дженериков, который можно использовать в качестве безопасной альтернативы `nullable` типам.
+
 ### Теперь наш проект защищён от багов?
 
 Нет. Но теперь от валидации мы ушли к парсингу: каждая функция, вызывающая другую функцию, должна будет гарантировать сходимость типов аргументов, что избавляет
@@ -504,7 +792,7 @@ if ($node->isNotEmpty()) {
 Или тоже <a href="https://github.com/kafkiansky/better-laravel" target="_blank">плагин</a> для Laravel, в котором среди прочего есть линтер для валидации наличия конфига по вложенным ключам (дот-нотация),
 опечатка в которых может привести к багам на проде.
 
-Таким образом, с помощью статанализатора и плагинов вы можете навернуть столько проверок вашего кода, что успешное прохождение `CI` будет гарантировать чуть ли не полную работспособность программы.
+Таким образом, с помощью статанализатора и плагинов вы можете навернуть столько проверок вашего кода, что успешное прохождение `CI` будет гарантировать чуть ли не полную работоспособность программы.
 
 По этой причине в PHP не нужны ни <a href="https://github.com/PHPGenerics/php-generics-rfc/issues/45" target="_blank">нативные дженерики</a>, ни больше <a href="https://wiki.php.net/rfc/true-type" target="_blank">нативных типов</a>,
 потому что все это давно уже есть в статических анализаторах, до возможностей которых интерпретатор придется очень долго дорабатывать, рискуя повторить историю **Go**,
