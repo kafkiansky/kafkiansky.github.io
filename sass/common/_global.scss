@@ -253,7 +253,23 @@ h1.title a:visited {
   color: #000;
 }
 
+h1.title::before {
+  content: "# ";
+}
+
+h1.title a {
+  color: #000;
+}
+
 h2.title a:visited {
+  color: #000;
+}
+
+h2.title::before {
+  content: "# ";
+}
+
+h2.title a {
   color: #000;
 }
 

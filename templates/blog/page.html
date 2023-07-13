@@ -47,6 +47,7 @@ created_time=created_time, updated_time=updated_time, page_section=page_section)
                 <article>
                     <div class="page-header">
                         <h1>{{ page.title }}</h1>
+                        {{ macros_publish::page_publish_metadata(page=page) }}
                     </div>
                     {% if page.toc %}
                     <ul>

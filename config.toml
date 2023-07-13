@@ -25,8 +25,6 @@ taxonomies = [
   {name = "tags"},
 ]
 
-insert_anchor_links = "left"
-
 # Whether to build a search index to be used later on by a JavaScript library
 # When set to "true", a search index is built from the pages and section
 # content for `default_language`.
