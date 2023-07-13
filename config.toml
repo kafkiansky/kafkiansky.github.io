@@ -25,6 +25,8 @@ taxonomies = [
   {name = "tags"},
 ]
 
+insert_anchor_links = "left"
+
 # Whether to build a search index to be used later on by a JavaScript library
 # When set to "true", a search index is built from the pages and section
 # content for `default_language`.
@@ -95,3 +97,9 @@ pre = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0
 url = "https://github.com/kafkiansky"
 post = "v0.1.0"
 weight = 20
+
+[page]
+toc = true
+
+[section]
+toc = true
