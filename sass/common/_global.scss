@@ -264,3 +264,7 @@ h3.title a:visited {
 h3.title::before {
   content: "# ";
 }
+
+h3.title a {
+  color: #000;
+}
