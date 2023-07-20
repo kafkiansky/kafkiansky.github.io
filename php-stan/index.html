@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" as="font" href="https://kafkiansky.github.io/fonts/vendor/jost/jost-v4-latin-regular.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="https://kafkiansky.github.io/fonts/vendor/jost/jost-v4-latin-700.woff2"  type="font/woff2" crossorigin>
+
+
+<link rel="stylesheet" href="https://kafkiansky.github.io/main.css">
+
+
+
+
+  
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+  ym(94221516, "init", {
+    clickmap:true,
+    trackLinks:true,
+    accurateTrackBounce:true
+  });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/94221516" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+
+
+	
+
+
+	
+
+<title>Статический анализ в PHP | kafkiansky.dev</title>
+<meta name="description" content="">
+<link rel="canonical" href="https://kafkiansky.github.io/php-stan/">
+
+
+
+
+
+
+  
+
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BreadcrumbList",
+    
+      
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          {
+            "@type": "ListItem",
+            "position":  1 ,
+            "name": "Home",
+            "item": "https://kafkiansky.github.io/"
+          },
+          
+          
+          {
+            "@type": "ListItem",
+            "position":  2 ,
+            "name": "Php Stan",
+            "item": "https://kafkiansky.github.io/php-stan/"
+          },
+        
+      
+    
+  }
+</script>
+
+
+
+
+
+
+  <meta name="theme-color" content="#fff">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://kafkiansky.github.io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://kafkiansky.github.io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://kafkiansky.github.io/favicon-16x16.png">
+  
+    <link rel="manifest" href="https://kafkiansky.github.io/site.webmanifest" crossorigin>
+  
+
+
+  
+
+</head>
+
+
+
+
+
+<body class="page single">
+  
+    
+<div class="header-bar fixed-top"></div>
+<header class="navbar fixed-top navbar-expand-md navbar-light">
+	<div class="container">
+		<input class="menu-btn order-0" type="checkbox" id="menu-btn">
+		<label class="menu-icon d-md-none" for="menu-btn"><span class="navicon"></span></label>
+		<a class="navbar-brand order-1 order-md-0 me-auto" href="https://kafkiansky.github.io">kafkiansky.dev</a>
+		<button id="mode" class="btn btn-link order-2 order-md-4" type="button" aria-label="Toggle mode">
+			<span class="toggle-dark"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
+			<span class="toggle-light"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span>
+		</button>
+		<ul class="navbar-nav fork-me order-3 order-md-5">
+			
+				
+					<li class="nav-item">
+						<a class="nav-link" href="https://github.com/kafkiansky"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg><span class="ms-2 visually-hidden">GitHub</span></a>
+					</li>
+				
+			
+		</ul>
+		<div class="collapse navbar-collapse order-4 order-md-1">
+			<ul class="navbar-nav main-nav me-auto order-5 order-md-2">
+				
+					
+				
+			</ul>
+			<div class="break order-6 d-md-none"></div>
+			
+				<form class="navbar-form flex-grow-1 order-7 order-md-3">
+					<input id="userinput" class="form-control is-search" type="search" placeholder="Искать"
+						aria-label="Искать" autocomplete="off">
+					<div id="suggestions" class="shadow bg-white rounded"></div>
+				</form>
+			
+		</div>
+	</div>
+</header>
+
+  
+
+  
+<div class="wrap container" role="document">
+    <div class="content">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10 col-xxl-8">
+                <article>
+                    <div class="page-header">
+                        <h1>Статический анализ в PHP</h1>
+                        
+<p><small>Posted July  6, 2023 by <a class="stretched-link position-relative" href="https://kafkiansky.github.io/authors/kafkiansky/">kafkiansky</a>&nbsp;&hyphen;&nbsp;<strong>15&nbsp;min read</strong></small><p>
+
+                    </div>
+                    
+                    <ul>
+                        
+                        <li>
+                            <a href="https://kafkiansky.github.io/php-stan/#iterators" class="toc-link">Итераторы</a>
+                            
+                        </li>
+                        
+                        <li>
+                            <a href="https://kafkiansky.github.io/php-stan/#primitive-types" class="toc-link">Примитивные типы</a>
+                            
+                        </li>
+                        
+                        <li>
+                            <a href="https://kafkiansky.github.io/php-stan/#features" class="toc-link">Необычные возможности</a>
+                            
+                        </li>
+                        
+                        <li>
+                            <a href="https://kafkiansky.github.io/php-stan/#generics" class="toc-link">Дженерики</a>
+                            
+                        </li>
+                        
+                        <li>
+                            <a href="https://kafkiansky.github.io/php-stan/#are-we-without-bugs-now" class="toc-link">Теперь наш проект защищён от багов?</a>
+                            
+                        </li>
+                        
+                    </ul>
+                    
+                    <p class="lead">Статический анализ в PHP – тема не сказать, что новая, но и недостаточно распространенная, чтобы перестать ее поднимать. Большинство библиотек и фреймворков либо используют статанализ только для нового кода, либо и вовсе пренебрегают им.</p>
+                    <p>Чтобы подчеркнуть важность статанализа, предлагаю посмотреть, а что там в других языках:</p>
+<ul>
+<li>в <strong>Rust</strong> стандартом является анализатор <a href="https://github.com/rust-lang/rust-clippy" target="_blank">clippy</a>, разрабатываемый авторами языка и предлагающий более 600-ти линтеров</li>
+<li>в <strong>Go</strong> принято использовать <a href="https://golangci-lint.run" target="_blank">golangci-lint</a>, который помогает улучшать производительность и безопасность кода </li>
+<li>для <strong>C#</strong> и <strong>C++</strong> можно использовать <a href="https://pvs-studio.ru/ru/pvs-studio" target="_blank">PVS-Studio</a>, который, по словам их авторов, насчитывает более 900-ти линтеров.</li>
+</ul>
+<p>Я намеренно привел в качестве примеров статически-типизированные компилируемые языки, чтобы показать, что эта тема широко распространена и актуальна для любого языка, и уже тем более должна быть актуальна для PHP, в котором шансы допустить разного рода ошибки внушительно выше.</p>
+<p>На сегодняшний день у вас есть выбор между двумя популярными статанализаторами: <a href="https://psalm.dev" target="_blank">Psalm</a> и <a href="https://phpstan.org/try" target="_blank">PHPStan</a>.
+Также вы можете использовать их одновременно, как делают многие. Это не создаст никаких проблем, так как оба пакета используют и обрабатывают одни и те же аннотации одинаково с той лишь разницей, что <strong>Psalm</strong> в контексте типов умеет чуть больше.</p>
+<h3 id="iterators" class="header title"><a href="https://kafkiansky.github.io/php-stan/#iterators">Итераторы</a></h3>
+<p>Не знаю, как вы, а я часто использую итераторы. Например, как понять, какого типа выдает значения итерируемый объект?</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#a71d5d;">final class </span><span>Cluster </span><span style="color:#a71d5d;">implements </span><span style="color:#000000;">\</span><span style="color:#0086b3;">IteratorAggregate
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">private readonly </span><span style="color:#a71d5d;">array </span><span style="color:#0086b3;">$nodes</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">getIterator</span><span>(): \</span><span style="color:#0086b3;">Traversable
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">yield from </span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">nodes</span><span>;
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">foreach </span><span>(</span><span style="color:#0086b3;">$cluster </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$node</span><span>) {
+</span><span>    </span><span style="color:#969896;">// ???
+</span><span>}
+</span></code></pre>
+<p>Без заглядывания в код – никак. А часто вы заглядываете в код или чейнджлоги библиотек после или перед их обновлением? Что если тип поменялся?
+Даже если вы со всей ответственностью подходите к обновлению зависимостей, неразумно тратить свое время на работу компилятором: отдайте это статанализатору.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#a71d5d;">final class </span><span>Node
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-string $host
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">public readonly </span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$host</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template-implements \IteratorAggregate&lt;Node&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>Cluster </span><span style="color:#a71d5d;">implements </span><span style="color:#000000;">\</span><span style="color:#0086b3;">IteratorAggregate
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-list&lt;Node&gt; $nodes
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">private readonly </span><span style="color:#a71d5d;">array </span><span style="color:#0086b3;">$nodes</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>    
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">getIterator</span><span>(): \</span><span style="color:#0086b3;">Traversable
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">yield from </span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">nodes</span><span>;
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">foreach </span><span>(</span><span style="color:#0086b3;">$cluster </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$node</span><span>) {
+</span><span>    </span><span style="color:#0086b3;">echo $node</span><span>-&gt;</span><span style="color:#0086b3;">host</span><span>;
+</span><span>}
+</span></code></pre>
+<p>Теперь, если тип значений у класса <code>Cluster</code> поменяется, вы узнаете об этом на этапе <code>CI</code>, а не на проде. Откуда у <code>\IteratorAggregate</code> появился дженерик-тип? 
+Все благодаря использованию статанализиторами стабов. Например, вот как выглядит <a href="https://github.com/vimeo/psalm/blob/master/stubs/CoreGenericIterators.phpstub#L9" target="_blank">стаб</a> для этого интерфейса у псалма. А <a href="https://github.com/JetBrains/phpstorm-stubs/blob/master/Core/Core_c.php#L41" target="_blank">так</a> он выглядит для phpstorm,
+из-за чего и работает автокомплит при вызове методов и свойств у объекта <code>$node</code>.</p>
+<p>Мы часто в переменных окружения храним небольшие словари, при работе с которыми хотим обрабатывать ситуацию, когда в словаре случайно оказалась пустая строка.
+Не проблема, напишем такую функцию:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-string $line
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> \Traversable&lt;non-empty-string&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">splitString</span><span>(</span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$line</span><span>): \</span><span style="color:#0086b3;">Traversable
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">foreach</span><span>(</span><span style="color:#0086b3;">explode</span><span>(</span><span style="color:#183691;">&#39;,&#39;</span><span>, </span><span style="color:#0086b3;">$line</span><span>) </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$v</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#183691;">&#39;&#39; </span><span style="color:#a71d5d;">!== </span><span style="color:#0086b3;">$v</span><span>) {
+</span><span>            </span><span style="color:#a71d5d;">yield </span><span style="color:#0086b3;">$v</span><span>;
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>Но поскольку в енвах все хранится в строках, а нужны нам бывают не только они, нам необходимо уметь парсить строки в нужные нам типы. Например, мы можем хранить в енвах идентификаторы шаблонов писем, которые являются позитивными числами.
+Напишем функцию, которая будет превращать итератор одного типа в итератор другого типа с помощью другой функции.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template E
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> \Traversable&lt;E&gt; $values
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> callable(E): T  $mapper
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> \Traversable&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">map</span><span>(\</span><span style="color:#0086b3;">Traversable $values</span><span>, </span><span style="color:#a71d5d;">callable </span><span style="color:#0086b3;">$mapper</span><span>): \</span><span style="color:#0086b3;">Traversable
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">foreach </span><span>(</span><span style="color:#0086b3;">$values </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$value</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">yield </span><span>$</span><span style="color:#0086b3;">mapper</span><span>(</span><span style="color:#0086b3;">$value</span><span>);
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>Напишем функцию для преобразования строки в число и проверку диапазона (функция намеренно упрощена):</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> positive-int
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">coerceToPositiveInt</span><span>(</span><span style="color:#0086b3;">mixed $value</span><span>): </span><span style="color:#a71d5d;">int
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">is_string</span><span>(</span><span style="color:#0086b3;">$value</span><span>)) {
+</span><span>        </span><span style="color:#0086b3;">$value </span><span style="color:#a71d5d;">=</span><span> (</span><span style="color:#a71d5d;">int</span><span>) </span><span style="color:#0086b3;">$value</span><span>;
+</span><span>    }
+</span><span>
+</span><span>	</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">is_int</span><span>(</span><span style="color:#0086b3;">$value</span><span>) </span><span style="color:#a71d5d;">&amp;&amp; </span><span style="color:#0086b3;">$value </span><span style="color:#a71d5d;">&gt; </span><span style="color:#0086b3;">0</span><span>) {
+</span><span>		</span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">$value</span><span>;
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#a71d5d;">throw new </span><span>\</span><span style="color:#0086b3;">InvalidArgumentException</span><span>(</span><span style="color:#0086b3;">sprintf</span><span>(</span><span style="color:#183691;">&#39;Expected positive-int, but the value of type %s passed.&#39;</span><span>, </span><span style="color:#0086b3;">get_debug_type</span><span>(</span><span style="color:#0086b3;">$value</span><span>)));
+</span><span>}
+</span></code></pre>
+<p>Соединим все вместе:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> positive-int
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">coerceToPositiveInt</span><span>(</span><span style="color:#0086b3;">mixed $value</span><span>): </span><span style="color:#a71d5d;">int
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">is_string</span><span>(</span><span style="color:#0086b3;">$value</span><span>)) {
+</span><span>        </span><span style="color:#0086b3;">$value </span><span style="color:#a71d5d;">=</span><span> (</span><span style="color:#a71d5d;">int</span><span>) </span><span style="color:#0086b3;">$value</span><span>;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">is_int</span><span>(</span><span style="color:#0086b3;">$value</span><span>) </span><span style="color:#a71d5d;">&amp;&amp; </span><span style="color:#0086b3;">$value </span><span style="color:#a71d5d;">&gt; </span><span style="color:#0086b3;">0</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">$value</span><span>;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#a71d5d;">throw new </span><span>\</span><span style="color:#0086b3;">InvalidArgumentException</span><span>(</span><span style="color:#0086b3;">sprintf</span><span>(</span><span style="color:#183691;">&#39;Expected positive-int, but the value of type %s passed.&#39;</span><span>, </span><span style="color:#0086b3;">get_debug_type</span><span>(</span><span style="color:#0086b3;">$value</span><span>)));
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-string $line
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> \Traversable&lt;non-empty-string&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">splitString</span><span>(</span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$line</span><span>): \</span><span style="color:#0086b3;">Traversable
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">foreach</span><span>(</span><span style="color:#0086b3;">explode</span><span>(</span><span style="color:#183691;">&#39;,&#39;</span><span>, </span><span style="color:#0086b3;">$line</span><span>) </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$v</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#183691;">&#39;&#39; </span><span style="color:#a71d5d;">!== </span><span style="color:#0086b3;">$v</span><span>) {
+</span><span>            </span><span style="color:#a71d5d;">yield </span><span style="color:#0086b3;">$v</span><span>;
+</span><span>        }
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template E
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> \Traversable&lt;E&gt; $values
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> callable(E): T  $mapper
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> \Traversable&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">map</span><span>(\</span><span style="color:#0086b3;">Traversable $values</span><span>, </span><span style="color:#a71d5d;">callable </span><span style="color:#0086b3;">$mapper</span><span>): \</span><span style="color:#0086b3;">Traversable
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">foreach </span><span>(</span><span style="color:#0086b3;">$values </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$value</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">yield </span><span>$</span><span style="color:#0086b3;">mapper</span><span>(</span><span style="color:#0086b3;">$value</span><span>);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">final class </span><span>Notifier
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> positive-int[] $templates
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">private readonly </span><span style="color:#a71d5d;">array </span><span style="color:#0086b3;">$templates</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$notifier </span><span style="color:#a71d5d;">= new </span><span style="color:#0086b3;">Notifier</span><span>(
+</span><span>    </span><span style="color:#0086b3;">iterator_to_array</span><span>(
+</span><span>        </span><span style="color:#0086b3;">map</span><span>(
+</span><span>            </span><span style="color:#0086b3;">splitString</span><span>(</span><span style="color:#183691;">&#39;1,2&#39;</span><span>),
+</span><span>            </span><span style="color:#0086b3;">coerceToPositiveInt</span><span>(</span><span style="color:#a71d5d;">...</span><span>),
+</span><span>        ),
+</span><span>    ),
+</span><span>);
+</span></code></pre>
+<p>Как видно, статанализатор (в данном случае <strong>psalm</strong>) смог вывести правильный тип при преобразовании итератора в массив и получить из <code>\Traversable&lt;positive-int&gt;</code> тип <code>positive-int[]</code>.</p>
+<h3 id="primitive-types" class="header title"><a href="https://kafkiansky.github.io/php-stan/#primitive-types">Примитивные типы</a></h3>
+<p>Я часто застаю себя за реализацией всякого рода бинарных протоколов, в которых приходится оперировать числами разного размера: <strong>int8</strong>, <strong>int16</strong>, <strong>uint32</strong> и так далее.
+А поскольку в php есть только <strong>int</strong>, который, в зависимости от разрядности платформы, представляет собой либо <strong>int32</strong>, либо <strong>int64</strong>, приходится как-то выкручиваться – как всегда, с помощью статического анализа.</p>
+<p>Написать функции, которые записывают <strong>int8</strong> и <strong>uint8</strong> в бинарной форме, можно с помощью указания диапазона значений у <strong>int</strong>. Такой формат поддерживают оба статанализатора.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> int&lt;-128, 127&gt; $v
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">writeInt8</span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$v</span><span>): </span><span style="color:#a71d5d;">string
+</span><span>{
+</span><span>	</span><span style="color:#a71d5d;">return </span><span>\</span><span style="color:#0086b3;">pack</span><span>(</span><span style="color:#183691;">&#39;c&#39;</span><span>, </span><span style="color:#0086b3;">$v</span><span>);
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> int&lt;0, 255&gt; $v
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">writeUint8</span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$v</span><span>): </span><span style="color:#a71d5d;">string
+</span><span>{
+</span><span>	</span><span style="color:#a71d5d;">return </span><span>\</span><span style="color:#0086b3;">pack</span><span>(</span><span style="color:#183691;">&#39;C&#39;</span><span>, </span><span style="color:#0086b3;">$v</span><span>);
+</span><span>}
+</span></code></pre>
+<p>Кстати, такие функции являются чистыми – то есть зависят только от входящих аргументов, – что мы можем явно указать с помощью аннотации <code>@pure</code>:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @pure
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> int&lt;-128, 127&gt; $v
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">writeInt8</span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$v</span><span>): </span><span style="color:#a71d5d;">string
+</span><span>{
+</span><span>	</span><span style="color:#a71d5d;">return </span><span>\</span><span style="color:#0086b3;">pack</span><span>(</span><span style="color:#183691;">&#39;c&#39;</span><span>, </span><span style="color:#0086b3;">$v</span><span>);
+</span><span>}
+</span></code></pre>
+<p>Например, функция, которая преобразует поток чисел в соответствующее им бинарное представление, могла бы принимать только набор чистых функций:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T of int
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> iterable&lt;T, pure-callable(T): string&gt; $writers
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> \Traversable&lt;string&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">writeBytes</span><span>(</span><span style="color:#0086b3;">iterable $writers</span><span>): \</span><span style="color:#0086b3;">Traversable
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">foreach</span><span>(</span><span style="color:#0086b3;">$writers </span><span style="color:#a71d5d;">as </span><span style="color:#0086b3;">$v </span><span style="color:#a71d5d;">=&gt; </span><span style="color:#0086b3;">$writer</span><span>) {
+</span><span>        </span><span style="color:#a71d5d;">yield </span><span>$</span><span style="color:#0086b3;">writer</span><span>(</span><span style="color:#0086b3;">$v</span><span>);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">writeBytes</span><span>([
+</span><span>    </span><span style="color:#a71d5d;">-</span><span style="color:#0086b3;">128 </span><span style="color:#a71d5d;">=&gt; </span><span style="color:#0086b3;">writeInt8</span><span>(</span><span style="color:#a71d5d;">...</span><span>),
+</span><span>    </span><span style="color:#0086b3;">127 </span><span style="color:#a71d5d;">=&gt; </span><span style="color:#0086b3;">writeInt8</span><span>(</span><span style="color:#a71d5d;">...</span><span>),
+</span><span>]);
+</span></code></pre>
+<p>Без аннотации <code>@pure</code> над функциями ваш код бы не прошел проверку.</p>
+<p>Иногда приходится иметь дело с литеральными типами. Это типы с фиксированным набором значений – другими словами, типы-значения. Например, 3 является числом, но не каждое число является тройкой.
+Мы не можем использовать в данном случае диапазон, как делали с <strong>int8</strong>, потому что значения могут идти не подряд: например, перечислить список http-кодов, при которых мы должны повторять http-запросы.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-string $uri
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> 301|500|502 	   $expectCode
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">healthcheck</span><span>(</span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$uri</span><span>, </span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$expectCode</span><span>): </span><span style="color:#a71d5d;">bool
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">doRequest</span><span>(</span><span style="color:#0086b3;">$uri</span><span>) </span><span style="color:#a71d5d;">=== </span><span style="color:#0086b3;">$expectCode</span><span>;
+</span><span>}
+</span></code></pre>
+<h3 id="features" class="header title"><a href="https://kafkiansky.github.io/php-stan/#features">Необычные возможности</a></h3>
+<p>Вообще говоря, статические анализаторы неуникальны в своих возможностях. Например, условные (возвращаемые) типы уже были в <strong>typescript</strong>, когда они появились в <strong>psalm</strong>, а чуть позже и в <strong>phpstan</strong>.</p>
+<p>Допустим, мы хотим написать функцию, которая соблюдает следующие требования:</p>
+<ul>
+<li>Принимает замыкание, возвращающее <code>?T</code>, и значение по умолчанию – так же типа <code>?T</code></li>
+<li>Если не передали значение по умолчанию, то возвращаемым типом функции будет <code>?T</code></li>
+<li>Если передали значение по умолчанию, то возвращаемым типом функции будет <code>T</code>.</li>
+</ul>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> *
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> callable(): ?T $value
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> ?T 		     $default
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> (T is null ? (?T): T)
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">tap</span><span>(</span><span style="color:#a71d5d;">callable </span><span style="color:#0086b3;">$value</span><span>, </span><span style="color:#0086b3;">mixed $default </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">null</span><span>): </span><span style="color:#0086b3;">mixed
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">return </span><span>$</span><span style="color:#0086b3;">value</span><span>() ?: </span><span style="color:#0086b3;">$default</span><span>;
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">final class </span><span>User
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">public readonly </span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$name</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$user1 </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">tap</span><span>(
+</span><span>    </span><span style="color:#a71d5d;">fn </span><span>(): </span><span style="color:#0086b3;">User </span><span>=&gt; </span><span style="color:#a71d5d;">new </span><span style="color:#0086b3;">User</span><span>(</span><span style="color:#183691;">&#39;kafkiansky&#39;</span><span>),
+</span><span>    </span><span style="color:#a71d5d;">new </span><span style="color:#0086b3;">User</span><span>(</span><span style="color:#183691;">&#39;anonymous&#39;</span><span>),
+</span><span>);
+</span><span>
+</span><span style="color:#0086b3;">$user2 </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">tap</span><span>(
+</span><span>    </span><span style="color:#a71d5d;">fn </span><span>(): </span><span style="color:#0086b3;">User </span><span>=&gt; </span><span style="color:#a71d5d;">new </span><span style="color:#0086b3;">User</span><span>(</span><span style="color:#183691;">&#39;kafkiansky&#39;</span><span>),
+</span><span>);
+</span><span>
+</span><span style="color:#0086b3;">echo $user1</span><span>-&gt;</span><span style="color:#0086b3;">name</span><span>;
+</span><span style="color:#0086b3;">echo $user2</span><span>?-&gt;</span><span style="color:#0086b3;">name</span><span>;
+</span></code></pre>
+<p>Если мы передадим значение по умолчанию, то можем спокойно обращаться к свойствам и методам нашего объекта без null-safe оператора, а если нет – только с ним.
+Таким образом, мы статически избавились от необходимости делать лишние проверки на <code>null</code> в местах со значением по умолчанию.</p>
+<p>Бывает, что нет возможности выделить тип в самостоятельный объект, но при этом он используется по всему проекту. Чтобы не ошибиться в очередной раз при описании типа, можно использовать алиасы типов.
+Взять тот же пример с <strong>int8</strong>, при наборе которого можно ошибиться в диапазоне значений, – хороший кандидат для алиаса.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @psalm-type Int8 = int&lt;-128, 127&gt; 
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>Type
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> Int8
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public static function </span><span style="color:#795da3;">assertInt8</span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$v</span><span>): </span><span style="color:#a71d5d;">int
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$v </span><span style="color:#a71d5d;">&gt;= -</span><span style="color:#0086b3;">128 </span><span style="color:#a71d5d;">&amp;&amp; </span><span style="color:#0086b3;">$v </span><span style="color:#a71d5d;">&lt;= </span><span style="color:#0086b3;">127</span><span>) {
+</span><span>            </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">$v</span><span>;
+</span><span>        }
+</span><span>
+</span><span>        </span><span style="color:#a71d5d;">throw new </span><span>\</span><span style="color:#0086b3;">InvalidArgumentException</span><span>(</span><span style="color:#183691;">&quot;The {$</span><span style="color:#0086b3;">v</span><span style="color:#183691;">} not valid int8.&quot;</span><span>);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @psalm-import-type Int8 from Type
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>Buffer
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> Int8 $v
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">writeInt8</span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$v</span><span>): </span><span style="color:#a71d5d;">string
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span>\</span><span style="color:#0086b3;">pack</span><span>(</span><span style="color:#183691;">&#39;c&#39;</span><span>, </span><span style="color:#0086b3;">$v</span><span>);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$buffer </span><span style="color:#a71d5d;">= new </span><span style="color:#0086b3;">Buffer</span><span>();
+</span><span style="color:#0086b3;">$buffer</span><span>-&gt;</span><span style="color:#0086b3;">writeInt8</span><span>(</span><span style="color:#0086b3;">Type</span><span>::</span><span style="color:#0086b3;">assertInt8</span><span>(</span><span style="color:#0086b3;">1</span><span>));
+</span></code></pre>
+<p>Мы использовали тип несколько раз, но описали – один.</p>
+<p>Что если мы уверены, что проверили границы типа, но при этом сам тип остался общим? Можно объяснить это с помощью специальной аннотации <code>[phpstan|psalm]-assert-if-[true|false]</code>:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#a71d5d;">final class </span><span>Node
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">public readonly </span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$name</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-assert-if-true non-empty-string $this-&gt;name
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">isNotEmpty</span><span>(): </span><span style="color:#a71d5d;">bool
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#183691;">&#39;&#39; </span><span style="color:#a71d5d;">!== </span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">name</span><span>;
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> non-empty-string $name
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">takesOnlyNonEmptyString</span><span>(</span><span style="color:#a71d5d;">string </span><span style="color:#0086b3;">$name</span><span>): </span><span style="color:#0086b3;">void
+</span><span>{
+</span><span>    </span><span style="color:#0086b3;">echo $name</span><span>;
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$node </span><span style="color:#a71d5d;">= new </span><span style="color:#0086b3;">Node</span><span>(</span><span style="color:#183691;">&#39;test&#39;</span><span>);
+</span><span>
+</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$node</span><span>-&gt;</span><span style="color:#0086b3;">isNotEmpty</span><span>()) {
+</span><span>	</span><span style="color:#0086b3;">takesOnlyNonEmptyString</span><span>(</span><span style="color:#0086b3;">$node</span><span>-&gt;</span><span style="color:#0086b3;">name</span><span>);
+</span><span>}
+</span></code></pre>
+<p>В данном случае тип поля <code>$name</code> остался прежним – <code>string</code>, – но благодаря аннотации мы доказали статанализатору, что границы типа были проверены.</p>
+<h3 id="generics" class="header title"><a href="https://kafkiansky.github.io/php-stan/#generics">Дженерики</a></h3>
+<p>Говорят, если произнести слово «дженерики», вас обязательно спросят, когда они появятся в PHP. А они есть. Причём в том виде, в котором они есть в других языках, — статическом.
+В компилируемых языках дженериков также не существует в рантайме, так как они стираются компилятором и заменяются на реальные типы.
+Заменяем компилятор на статанализатор и получаем то же самое – те же возможности и гарантии.</p>
+<p>Я не буду показывать пример с коллекциями – <strong>hello, world</strong> из мира дженериков, – а вместо этого давайте попробуем реализовать тип <code>Option</code> из <strong>Rust</strong>.</p>
+<p><code>Option</code> – это супертип для типов <code>Some&lt;T&gt;</code> и <code>None</code>, который вынуждает вас явно обрабатывать отсутствие значения в отличие от <code>null</code>, способному привести к
+<a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/" target="_blank">неприятным последствиям</a>.</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T 
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">abstract class </span><span>Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> T
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">abstract public function </span><span style="color:#795da3;">unwrap</span><span>(): </span><span style="color:#0086b3;">mixed</span><span>;
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template-extends Option&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>Some </span><span style="color:#a71d5d;">extends </span><span style="color:#000000;">Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-pure
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@internal 
+</span><span style="color:#969896;">     *
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> T $value
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>(
+</span><span>        </span><span style="color:#0086b3;">private readonly mixed $value</span><span>,
+</span><span>    ) {
+</span><span>    }
+</span><span>    
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">unwrap</span><span>(): </span><span style="color:#0086b3;">mixed
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">value</span><span>;
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template-extends Option&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>None </span><span style="color:#a71d5d;">extends </span><span style="color:#000000;">Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-pure
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@internal 
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#0086b3;">__construct</span><span>()
+</span><span>    {
+</span><span>    }
+</span><span>    
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">unwrap</span><span>(): </span><span style="color:#0086b3;">never
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">throw new </span><span>\</span><span style="color:#0086b3;">RuntimeException</span><span>(</span><span style="color:#183691;">&#39;None unwrapped.&#39;</span><span>);
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>На данный момент мы имеем простой тип, который пока еще не сильно лучше <code>nullable</code> типа, потому что тоже бросает исключение. Добавим сахара:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T 
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">abstract class </span><span>Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-pure
+</span><span style="color:#969896;">     * @template E
+</span><span style="color:#969896;">     * @psalm-param E $value
+</span><span style="color:#969896;">     *
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> Some&lt;E&gt;
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">final public static function </span><span style="color:#795da3;">some</span><span>(</span><span style="color:#0086b3;">mixed $value</span><span>): </span><span style="color:#0086b3;">Some
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return new </span><span style="color:#0086b3;">Some</span><span>(</span><span style="color:#0086b3;">$value</span><span>);
+</span><span>    }
+</span><span>
+</span><span>   </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-pure
+</span><span style="color:#969896;">     * @template E
+</span><span style="color:#969896;">     *
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> None&lt;E&gt;
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">final public static function </span><span style="color:#795da3;">none</span><span>(): </span><span style="color:#0086b3;">None
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return new </span><span style="color:#0086b3;">None</span><span>();
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-assert-if-true T $this-&gt;unwrap()
+</span><span style="color:#969896;">     * @psalm-this-out Some&lt;T&gt;
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">final public function </span><span style="color:#795da3;">isSome</span><span>(): </span><span style="color:#a71d5d;">bool
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#df5000;">$this </span><span style="color:#a71d5d;">instanceof </span><span style="color:#0086b3;">Some</span><span>;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-this-out None&lt;T&gt;
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">final public function </span><span style="color:#795da3;">isNone</span><span>(): </span><span style="color:#a71d5d;">bool
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#df5000;">$this </span><span style="color:#a71d5d;">instanceof </span><span style="color:#0086b3;">None</span><span>;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @psalm-if-this-is Some&lt;T&gt;
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> T
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">abstract public function </span><span style="color:#795da3;">unwrap</span><span>(): </span><span style="color:#0086b3;">mixed</span><span>;
+</span><span>}
+</span></code></pre>
+<p>Теперь такой код не будет пропущен статанализатором:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> Option&lt;positive-int&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">doRequest</span><span>(): </span><span style="color:#0086b3;">Option
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">Option</span><span>::</span><span style="color:#0086b3;">some</span><span>(</span><span style="color:#0086b3;">200</span><span>);
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$option </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">doRequest</span><span>();
+</span><span style="color:#0086b3;">echo $option</span><span>-&gt;</span><span style="color:#0086b3;">unwrap</span><span>(); </span><span style="color:#969896;">// ERROR: IfThisIsMismatch - 139:16 - Class type must be Some&lt;T:Option as mixed&gt; current type Option&lt;int&lt;1, max&gt;&gt;
+</span></code></pre>
+<p>Дело в том, что теперь метод <code>unwrap</code> можно вызывать только на типе <code>Some&lt;T&gt;</code>, а на данном этапе типом переменной <code>$option</code> является тип <code>Option&lt;positive-int&gt;</code>,
+что не соответствует ограничениям аннотации <code>@psalm-if-this-is Some&lt;T&gt;</code>. Чтобы вызвать метод <code>unwrap</code> без ошибок от статанализитора, вам необходимо проверить, что в <code>Option</code> лежит действительно <code>Some&lt;T&gt;</code>:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> Option&lt;positive-int&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">doRequest</span><span>(): </span><span style="color:#0086b3;">Option
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">Option</span><span>::</span><span style="color:#0086b3;">some</span><span>(</span><span style="color:#0086b3;">200</span><span>);
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$option </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">doRequest</span><span>();
+</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$option</span><span>-&gt;</span><span style="color:#0086b3;">isSome</span><span>()) {
+</span><span>	</span><span style="color:#0086b3;">echo $option</span><span>-&gt;</span><span style="color:#0086b3;">unwrap</span><span>() </span><span style="color:#a71d5d;">&gt; </span><span style="color:#0086b3;">200</span><span>;
+</span><span>}
+</span></code></pre>
+<p>Когда вы вызываете метод <code>isSome</code>, тип объекта с <code>Option&lt;T&gt;</code> сужается до <code>Some&lt;T&gt;</code>, благодаря аннотации <code>@psalm-this-out Some&lt;T&gt;</code>.</p>
+<p>Также вы не можете вызывать метод <code>unwrap</code>, если <code>isNone()</code> будет утвердительным:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * </span><span style="color:#a71d5d;">@return</span><span style="color:#969896;"> Option&lt;positive-int&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">function </span><span style="color:#795da3;">doRequest</span><span>(): </span><span style="color:#0086b3;">Option
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">Option</span><span>::</span><span style="color:#0086b3;">some</span><span>(</span><span style="color:#0086b3;">200</span><span>);
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">$option </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">doRequest</span><span>();
+</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$option</span><span>-&gt;</span><span style="color:#0086b3;">isNone</span><span>()) {
+</span><span>	</span><span style="color:#0086b3;">echo $option</span><span>-&gt;</span><span style="color:#0086b3;">unwrap</span><span>(); </span><span style="color:#969896;">// ERROR: NoValue - 140:7 - All possible types for this argument were invalidated - This may be dead code
+</span><span>}
+</span></code></pre>
+<p>Таким образом, вы либо явно проверяете, что значение существует, и используете его, либо явно затыкаете статанализатор.
+Оба варианта если и не избавляют от багов полностью (в конце концов, вы можете обмануть статанализатор аннотациями), то по крайней мере заставляют
+вас подумать о том, что вы делаете. </p>
+<p>Добавим еще немного методов:</p>
+<pre data-lang="php" style="background-color:#ffffff;color:#333333;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span style="color:#a71d5d;">declare</span><span>(</span><span style="color:#0086b3;">strict_types</span><span style="color:#a71d5d;">=</span><span style="color:#0086b3;">1</span><span>);
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T 
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">abstract class </span><span>Option
+</span><span>{
+</span><span>    </span><span style="color:#a71d5d;">...
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * </span><span style="color:#a71d5d;">@param</span><span style="color:#969896;"> callable(T): bool $f
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">final public function </span><span style="color:#795da3;">isSomeAnd</span><span>(</span><span style="color:#a71d5d;">callable </span><span style="color:#0086b3;">$f</span><span>): </span><span style="color:#a71d5d;">bool
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">isSome</span><span>() ? $</span><span style="color:#0086b3;">f</span><span>(</span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">unwrap</span><span>()) : </span><span style="color:#0086b3;">false</span><span>; 
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * @template Te
+</span><span style="color:#969896;">     * @psalm-param \Closure(T): Te       $onSome
+</span><span style="color:#969896;">     * @psalm-param (\Closure(): Te)|null $onNone
+</span><span style="color:#969896;">     *
+</span><span style="color:#969896;">     * @psalm-return ($onNone is null ? Option&lt;T&gt; : Some&lt;T&gt;)
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">abstract public function </span><span style="color:#795da3;">map</span><span>(\</span><span style="color:#0086b3;">Closure $onSome</span><span>, </span><span style="color:#a71d5d;">?</span><span>\</span><span style="color:#0086b3;">Closure $onNone </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">null</span><span>): </span><span style="color:#0086b3;">Option</span><span>;
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template-extends Option&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>None </span><span style="color:#a71d5d;">extends </span><span style="color:#000000;">Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">map</span><span>(\</span><span style="color:#0086b3;">Closure $onSome</span><span>, </span><span style="color:#a71d5d;">?</span><span>\</span><span style="color:#0086b3;">Closure $onNone </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">null</span><span>): </span><span style="color:#0086b3;">Option
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#0086b3;">null </span><span style="color:#a71d5d;">!== </span><span style="color:#0086b3;">$onNone</span><span> ? </span><span style="color:#df5000;">self</span><span>::</span><span style="color:#0086b3;">some</span><span>($</span><span style="color:#0086b3;">onNone</span><span>()) : </span><span style="color:#df5000;">self</span><span>::</span><span style="color:#0086b3;">none</span><span>();
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#969896;">/**
+</span><span style="color:#969896;"> * @template T
+</span><span style="color:#969896;"> * @template-extends Option&lt;T&gt;
+</span><span style="color:#969896;"> */
+</span><span style="color:#a71d5d;">final class </span><span>Some </span><span style="color:#a71d5d;">extends </span><span style="color:#000000;">Option
+</span><span>{
+</span><span>    </span><span style="color:#969896;">/**
+</span><span style="color:#969896;">     * {</span><span style="color:#a71d5d;">@inheritdoc</span><span style="color:#969896;">}
+</span><span style="color:#969896;">     */
+</span><span>    </span><span style="color:#a71d5d;">public function </span><span style="color:#795da3;">map</span><span>(\</span><span style="color:#0086b3;">Closure $onSome</span><span>, </span><span style="color:#a71d5d;">?</span><span>\</span><span style="color:#0086b3;">Closure $onNone </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">null</span><span>): </span><span style="color:#0086b3;">Option
+</span><span>    {
+</span><span>        </span><span style="color:#a71d5d;">return </span><span style="color:#df5000;">self</span><span>::</span><span style="color:#0086b3;">some</span><span>($</span><span style="color:#0086b3;">onSome</span><span>(</span><span style="color:#df5000;">$this</span><span>-&gt;</span><span style="color:#0086b3;">value</span><span>));
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">...
+</span><span>
+</span><span style="color:#0086b3;">$option </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">doRequest</span><span>();
+</span><span>
+</span><span style="color:#0086b3;">$another </span><span style="color:#a71d5d;">= </span><span style="color:#0086b3;">$option</span><span>-&gt;</span><span style="color:#0086b3;">map</span><span>(</span><span style="color:#a71d5d;">fn </span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$code</span><span>): </span><span style="color:#a71d5d;">string </span><span>=&gt; (</span><span style="color:#a71d5d;">string</span><span>) </span><span style="color:#0086b3;">$code</span><span>);
+</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$another</span><span>-&gt;</span><span style="color:#0086b3;">isSome</span><span>()) {
+</span><span>    </span><span style="color:#0086b3;">echo $another</span><span>-&gt;</span><span style="color:#0086b3;">unwrap</span><span>(); </span><span style="color:#969896;">// OK
+</span><span>}
+</span><span>
+</span><span style="color:#a71d5d;">if </span><span>(</span><span style="color:#0086b3;">$option</span><span>-&gt;</span><span style="color:#0086b3;">isSomeAnd</span><span>(</span><span style="color:#a71d5d;">fn </span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$code</span><span>): </span><span style="color:#a71d5d;">bool </span><span>=&gt; </span><span style="color:#0086b3;">$code </span><span style="color:#a71d5d;">&gt; </span><span style="color:#0086b3;">200</span><span>)) {
+</span><span>    </span><span style="color:#0086b3;">echo </span><span style="color:#183691;">&#39;Ok&#39;</span><span>; </span><span style="color:#969896;">// OK
+</span><span>}
+</span><span>
+</span><span style="color:#0086b3;">echo 200 </span><span style="color:#a71d5d;">&lt; </span><span style="color:#0086b3;">$option
+</span><span>    -&gt;</span><span style="color:#0086b3;">map</span><span>(
+</span><span>        </span><span style="color:#a71d5d;">fn </span><span>(</span><span style="color:#a71d5d;">int </span><span style="color:#0086b3;">$code</span><span>): </span><span style="color:#a71d5d;">string </span><span>=&gt; (</span><span style="color:#a71d5d;">string</span><span>) </span><span style="color:#0086b3;">$code</span><span>,
+</span><span>        </span><span style="color:#a71d5d;">fn </span><span>(): </span><span style="color:#a71d5d;">int </span><span>=&gt; </span><span style="color:#0086b3;">500</span><span>,
+</span><span>    )
+</span><span>    -&gt;</span><span style="color:#0086b3;">unwrap</span><span>(); </span><span style="color:#969896;">// OK
+</span></code></pre>
+<p>Обратите внимание, что на последнем выражении мы можем вызывать <code>unwrap</code> сразу же, без проверки на <code>isSome</code>. Это доступно благодаря условным возвращаемым типам, а именно аннотации <code>@psalm-return ($onNone is null ? Option&lt;T&gt; : Some&lt;T&gt;)</code>,
+которая говорит, что, если мы никак не обработали тип <code>None</code>, то вернется базовый тип <code>Option&lt;T&gt;</code>, в обратном случае всегда вернется <code>Some&lt;T&gt;</code>.
+Таким образом мы получили мощный тип на основе дженериков, который можно использовать в качестве безопасной альтернативы <code>nullable</code> типам.</p>
+<h3 id="are-we-without-bugs-now" class="header title"><a href="https://kafkiansky.github.io/php-stan/#are-we-without-bugs-now">Теперь наш проект защищён от багов?</a></h3>
+<p>Нет. Но теперь от валидации мы ушли к парсингу: каждая функция, вызывающая другую функцию, должна будет гарантировать сходимость типов аргументов, что избавляет
+от необходимости делать это несколько раз и дает больше информации о типах. Другими словами, мы по-прежнему должны проверять, что работаем с позитивным числом, не пустой строкой,
+массивом с определенными ключами, итератором конкретного типа, но теперь информация о значениях находится не (или не только) в валидации, но в самих типах.
+На эту тему советую замечательную статью <a href="https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/" target="_blank">Parse, don’t validate</a>, в которой приведено больше аргументов в пользу такого подхода.</p>
+<p>Однако статический анализ полезен не только в контексте парсинга типов: его возможности безграничны. Так, манипулируя AST представлением нашего кода, мы можем собирать много полезной информации о нем, используя систему плагинов статанализаторов.
+Позже эту информацию можно пустить на организацию разного рода ограничений и проверок, специфичных для вашего проекта или фреймворка.
+Осознав это, становится понятно, почему статический анализ популярен и для компилируемых языков, в которых, как кажется, компиляторы и так должны от всего защищать.
+Вы не будете добавлять в компилятор запрет на инициализацию массивов без ранней аллокации памяти, потому что с точки зрения компилятора это не ошибка,
+а с точки зрения статанализатора, который руководствуется собирательным опытом сотни разработчиков, – да, поскольку это может привести к деградации производительности программы.
+Иначе говоря, компилятор про ошибки, которые невозможно игнорировать, а статический анализатор про ошибки, которые можно подавлять (на свой страх и риск).</p>
+<p>Например, вы можете поставить плагин к псалму, запрещающий использование конструкции <a href="https://github.com/marartner/psalm-no-empty" target="_blank">empty</a> из-за ее интересных <a href="https://www.beberlei.de/post/when_to_use_empty_in_php_i_say_never" target="_blank">особенностей</a>.
+Можно ли провернуть такое на уровне интерпретатора? Нет, потому что это груз истории языка, который невозможно снять без того, чтобы не сломать половину проектов. На это просто никто не пойдет.</p>
+<p>Или <a href="https://github.com/boesing/psalm-plugin-stringf" target="_blank">плагин</a> для валидации <code>sprintf</code>, <code>printf</code> и похожих функций на правильное количество и типы аргументов. И пусть это не кажется вам мелочью,
+потому что такая конструкция <code>sprintf('The message is %s')</code> кинет исключение <code>ArgumentCountError</code> прямо в рантайме, с чем я однажды столкнулся, когда нашел код, где в <code>catch</code> блоке обрабатывалось исключение с неправильно написанным <code>sprintf</code>, что порождало другое исключение,
+которое уже никто не перехватывал. Например, в <strong>Rust</strong> такое валидируется на этапе компиляции. Попробуйте кусочек раста у себя: поставьте плагин.</p>
+<p>Вы можете запрещать или валидировать не только функции, но и целые пласты кода. Например, <a href="https://github.com/kafkiansky/service-locator-interrupter" target="_blank">плагин</a> для Laravel, запрещающий использование сервис-локаторов в любом их представлении: в виде фасадов, функций, контейнеров.</p>
+<p>Или тоже <a href="https://github.com/kafkiansky/better-laravel" target="_blank">плагин</a> для Laravel, в котором среди прочего есть линтер для валидации наличия конфига по вложенным ключам (дот-нотация),
+опечатка в которых может привести к багам на проде.</p>
+<p>Таким образом, с помощью статанализатора и плагинов вы можете навернуть столько проверок вашего кода, что успешное прохождение <code>CI</code> будет гарантировать чуть ли не полную работоспособность программы.</p>
+<p>По этой причине в PHP не нужны ни <a href="https://github.com/PHPGenerics/php-generics-rfc/issues/45" target="_blank">нативные дженерики</a>, ни больше <a href="https://wiki.php.net/rfc/true-type" target="_blank">нативных типов</a>,
+потому что все это давно уже есть в статических анализаторах, до возможностей которых интерпретатор придется очень долго дорабатывать, рискуя повторить историю <strong>Go</strong>,
+в котором дженерики на сегодняшний день получились, мягко говоря, не тем, к чему все привыкли. Кроме того, релизный цикл и фикс багов у статанализаторов происходит намного чаще, чем у языка, большие релизы которого происходят раз в год.
+И это не считая проблемы с командой разработки языка (особенно после ухода Никиты Попова), которая просто не в состоянии разрабатывать и поддерживать тот объем функций, которые уже сейчас дают статические анализаторы, поэтому выбор – использовать их или нет – довольно очевиден.</p>
+
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  
+    
+<footer class="footer text-muted">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 order-first order-lg-last text-lg-end">
+				<ul class="list-inline">
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+</footer>
+
+  
+
+  
+<script type="text/javascript" src="https://kafkiansky.github.io/js/main.js" defer></script>
+
+  <script type="text/javascript" src="https://kafkiansky.github.io/plugins/elasticlunr.min.js" defer></script>
+  <script type="text/javascript" src="https://kafkiansky.github.io/search_index.en.js" defer></script>
+  <script type="text/javascript" src="https://kafkiansky.github.io/js/search.js" defer></script>
+
+  
+</body>
+</html>

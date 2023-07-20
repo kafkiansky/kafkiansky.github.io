@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title>kafkiansky.dev</title>
+      <link>https://kafkiansky.github.io</link>
+      <description></description>
+      <generator>Zola</generator>
+      <language>en</language>
+      <atom:link href="https://kafkiansky.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Thu, 06 Jul 2023 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Статический анализ в PHP</title>
+          <pubDate>Thu, 06 Jul 2023 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://kafkiansky.github.io/php-stan/</link>
+          <guid>https://kafkiansky.github.io/php-stan/</guid>
+          <description>&lt;p&gt;Чтобы подчеркнуть важность статанализа, предлагаю посмотреть, а что там в других языках:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;в &lt;strong&gt;Rust&lt;&#x2F;strong&gt; стандартом является анализатор &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;rust-clippy&quot; target=&quot;_blank&quot;&gt;clippy&lt;&#x2F;a&gt;, разрабатываемый авторами языка и предлагающий более 600-ти линтеров&lt;&#x2F;li&gt;
+&lt;li&gt;в &lt;strong&gt;Go&lt;&#x2F;strong&gt; принято использовать &lt;a href=&quot;https:&#x2F;&#x2F;golangci-lint.run&quot; target=&quot;_blank&quot;&gt;golangci-lint&lt;&#x2F;a&gt;, который помогает улучшать производительность и безопасность кода &lt;&#x2F;li&gt;
+&lt;li&gt;для &lt;strong&gt;C#&lt;&#x2F;strong&gt; и &lt;strong&gt;C++&lt;&#x2F;strong&gt; можно использовать &lt;a href=&quot;https:&#x2F;&#x2F;pvs-studio.ru&#x2F;ru&#x2F;pvs-studio&quot; target=&quot;_blank&quot;&gt;PVS-Studio&lt;&#x2F;a&gt;, который, по словам их авторов, насчитывает более 900-ти линтеров.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Я намеренно привел в качестве примеров статически-типизированные компилируемые языки, чтобы показать, что эта тема широко распространена и актуальна для любого языка, и уже тем более должна быть актуальна для PHP, в котором шансы допустить разного рода ошибки внушительно выше.&lt;&#x2F;p&gt;
+&lt;p&gt;На сегодняшний день у вас есть выбор между двумя популярными статанализаторами: &lt;a href=&quot;https:&#x2F;&#x2F;psalm.dev&quot; target=&quot;_blank&quot;&gt;Psalm&lt;&#x2F;a&gt; и &lt;a href=&quot;https:&#x2F;&#x2F;phpstan.org&#x2F;try&quot; target=&quot;_blank&quot;&gt;PHPStan&lt;&#x2F;a&gt;.
+Также вы можете использовать их одновременно, как делают многие. Это не создаст никаких проблем, так как оба пакета используют и обрабатывают одни и те же аннотации одинаково с той лишь разницей, что &lt;strong&gt;Psalm&lt;&#x2F;strong&gt; в контексте типов умеет чуть больше.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;iterators&quot; class=&quot;header title&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;kafkiansky.github.io&#x2F;php-stan&#x2F;#iterators&quot;&gt;Итераторы&lt;&#x2F;a&gt;&lt;&#x2F;h3&gt;
+&lt;p&gt;Не знаю, как вы, а я часто использую итераторы. Например, как понять, какого типа выдает значения итерируемый объект?&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Cluster &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;implements &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;IteratorAggregate
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;private readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;array &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$nodes&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;getIterator&lt;&#x2F;span&gt;&lt;span&gt;(): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield from &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;nodes&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$cluster &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$node&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; ???
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Без заглядывания в код – никак. А часто вы заглядываете в код или чейнджлоги библиотек после или перед их обновлением? Что если тип поменялся?
+Даже если вы со всей ответственностью подходите к обновлению зависимостей, неразумно тратить свое время на работу компилятором: отдайте это статанализатору.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Node
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-string $host
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;public readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$host&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template-implements \IteratorAggregate&amp;lt;Node&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Cluster &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;implements &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;IteratorAggregate
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-list&amp;lt;Node&amp;gt; $nodes
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;private readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;array &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$nodes&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;    
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;getIterator&lt;&#x2F;span&gt;&lt;span&gt;(): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield from &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;nodes&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$cluster &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$node&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $node&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;host&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Теперь, если тип значений у класса &lt;code&gt;Cluster&lt;&#x2F;code&gt; поменяется, вы узнаете об этом на этапе &lt;code&gt;CI&lt;&#x2F;code&gt;, а не на проде. Откуда у &lt;code&gt;\IteratorAggregate&lt;&#x2F;code&gt; появился дженерик-тип? 
+Все благодаря использованию статанализиторами стабов. Например, вот как выглядит &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;vimeo&#x2F;psalm&#x2F;blob&#x2F;master&#x2F;stubs&#x2F;CoreGenericIterators.phpstub#L9&quot; target=&quot;_blank&quot;&gt;стаб&lt;&#x2F;a&gt; для этого интерфейса у псалма. А &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;JetBrains&#x2F;phpstorm-stubs&#x2F;blob&#x2F;master&#x2F;Core&#x2F;Core_c.php#L41&quot; target=&quot;_blank&quot;&gt;так&lt;&#x2F;a&gt; он выглядит для phpstorm,
+из-за чего и работает автокомплит при вызове методов и свойств у объекта &lt;code&gt;$node&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Мы часто в переменных окружения храним небольшие словари, при работе с которыми хотим обрабатывать ситуацию, когда в словаре случайно оказалась пустая строка.
+Не проблема, напишем такую функцию:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-string $line
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;non-empty-string&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;splitString&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$line&lt;&#x2F;span&gt;&lt;span&gt;): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;explode&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;,&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$line&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;&amp;#39; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;!== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;        }
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Но поскольку в енвах все хранится в строках, а нужны нам бывают не только они, нам необходимо уметь парсить строки в нужные нам типы. Например, мы можем хранить в енвах идентификаторы шаблонов писем, которые являются позитивными числами.
+Напишем функцию, которая будет превращать итератор одного типа в итератор другого типа с помощью другой функции.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template E
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;E&amp;gt; $values
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; callable(E): T  $mapper
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable $values&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;callable &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$mapper&lt;&#x2F;span&gt;&lt;span&gt;): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$values &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span&gt;$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mapper&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Напишем функцию для преобразования строки в число и проверку диапазона (функция намеренно упрощена):&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; positive-int
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;coerceToPositiveInt&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed $value&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;is_string&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;)) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;is_int&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;throw new &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;InvalidArgumentException&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;sprintf&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;Expected positive-int, but the value of type %s passed.&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;get_debug_type&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;)));
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Соединим все вместе:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; positive-int
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;coerceToPositiveInt&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed $value&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;is_string&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;)) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;is_int&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;throw new &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;InvalidArgumentException&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;sprintf&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;Expected positive-int, but the value of type %s passed.&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;get_debug_type&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;)));
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-string $line
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;non-empty-string&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;splitString&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$line&lt;&#x2F;span&gt;&lt;span&gt;): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;explode&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;,&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$line&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;&amp;#39; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;!== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;        }
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template E
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;E&amp;gt; $values
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; callable(E): T  $mapper
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable $values&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;callable &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$mapper&lt;&#x2F;span&gt;&lt;span&gt;): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$values &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span&gt;$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mapper&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Notifier
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; positive-int[] $templates
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;private readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;array &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$templates&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$notifier &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Notifier&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;iterator_to_array&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;splitString&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;1,2&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;coerceToPositiveInt&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;...&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;        ),
+&lt;&#x2F;span&gt;&lt;span&gt;    ),
+&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Как видно, статанализатор (в данном случае &lt;strong&gt;psalm&lt;&#x2F;strong&gt;) смог вывести правильный тип при преобразовании итератора в массив и получить из &lt;code&gt;\Traversable&amp;lt;positive-int&amp;gt;&lt;&#x2F;code&gt; тип &lt;code&gt;positive-int[]&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;primitive-types&quot; class=&quot;header title&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;kafkiansky.github.io&#x2F;php-stan&#x2F;#primitive-types&quot;&gt;Примитивные типы&lt;&#x2F;a&gt;&lt;&#x2F;h3&gt;
+&lt;p&gt;Я часто застаю себя за реализацией всякого рода бинарных протоколов, в которых приходится оперировать числами разного размера: &lt;strong&gt;int8&lt;&#x2F;strong&gt;, &lt;strong&gt;int16&lt;&#x2F;strong&gt;, &lt;strong&gt;uint32&lt;&#x2F;strong&gt; и так далее.
+А поскольку в php есть только &lt;strong&gt;int&lt;&#x2F;strong&gt;, который, в зависимости от разрядности платформы, представляет собой либо &lt;strong&gt;int32&lt;&#x2F;strong&gt;, либо &lt;strong&gt;int64&lt;&#x2F;strong&gt;, приходится как-то выкручиваться – как всегда, с помощью статического анализа.&lt;&#x2F;p&gt;
+&lt;p&gt;Написать функции, которые записывают &lt;strong&gt;int8&lt;&#x2F;strong&gt; и &lt;strong&gt;uint8&lt;&#x2F;strong&gt; в бинарной форме, можно с помощью указания диапазона значений у &lt;strong&gt;int&lt;&#x2F;strong&gt;. Такой формат поддерживают оба статанализатора.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; int&amp;lt;-128, 127&amp;gt; $v
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;pack&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;c&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; int&amp;lt;0, 255&amp;gt; $v
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;writeUint8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;pack&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;C&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Кстати, такие функции являются чистыми – то есть зависят только от входящих аргументов, – что мы можем явно указать с помощью аннотации &lt;code&gt;@pure&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @pure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; int&amp;lt;-128, 127&amp;gt; $v
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;pack&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;c&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Например, функция, которая преобразует поток чисел в соответствующее им бинарное представление, могла бы принимать только набор чистых функций:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T of int
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; iterable&amp;lt;T, pure-callable(T): string&amp;gt; $writers
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; \Traversable&amp;lt;string&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;writeBytes&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;iterable $writers&lt;&#x2F;span&gt;&lt;span&gt;): \&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Traversable
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;foreach&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$writers &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;as &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$writer&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield &lt;&#x2F;span&gt;&lt;span&gt;$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;writer&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;writeBytes&lt;&#x2F;span&gt;&lt;span&gt;([
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;128 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;...&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;127 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;...&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;]);
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Без аннотации &lt;code&gt;@pure&lt;&#x2F;code&gt; над функциями ваш код бы не прошел проверку.&lt;&#x2F;p&gt;
+&lt;p&gt;Иногда приходится иметь дело с литеральными типами. Это типы с фиксированным набором значений – другими словами, типы-значения. Например, 3 является числом, но не каждое число является тройкой.
+Мы не можем использовать в данном случае диапазон, как делали с &lt;strong&gt;int8&lt;&#x2F;strong&gt;, потому что значения могут идти не подряд: например, перечислить список http-кодов, при которых мы должны повторять http-запросы.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-string $uri
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; 301|500|502 	   $expectCode
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;healthcheck&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$uri&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$expectCode&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$uri&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$expectCode&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;features&quot; class=&quot;header title&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;kafkiansky.github.io&#x2F;php-stan&#x2F;#features&quot;&gt;Необычные возможности&lt;&#x2F;a&gt;&lt;&#x2F;h3&gt;
+&lt;p&gt;Вообще говоря, статические анализаторы неуникальны в своих возможностях. Например, условные (возвращаемые) типы уже были в &lt;strong&gt;typescript&lt;&#x2F;strong&gt;, когда они появились в &lt;strong&gt;psalm&lt;&#x2F;strong&gt;, а чуть позже и в &lt;strong&gt;phpstan&lt;&#x2F;strong&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Допустим, мы хотим написать функцию, которая соблюдает следующие требования:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Принимает замыкание, возвращающее &lt;code&gt;?T&lt;&#x2F;code&gt;, и значение по умолчанию – так же типа &lt;code&gt;?T&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;Если не передали значение по умолчанию, то возвращаемым типом функции будет &lt;code&gt;?T&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;Если передали значение по умолчанию, то возвращаемым типом функции будет &lt;code&gt;T&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; callable(): ?T $value
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; ?T 		     $default
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; (T is null ? (?T): T)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;tap&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;callable &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed $default &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;null&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;value&lt;&#x2F;span&gt;&lt;span&gt;() ?: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$default&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;User
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;public readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$name&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$user1 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;tap&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;User &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;User&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;kafkiansky&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;User&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;anonymous&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$user2 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;tap&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;User &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;User&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;kafkiansky&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;),
+&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $user1&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $user2&lt;&#x2F;span&gt;&lt;span&gt;?-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Если мы передадим значение по умолчанию, то можем спокойно обращаться к свойствам и методам нашего объекта без null-safe оператора, а если нет – только с ним.
+Таким образом, мы статически избавились от необходимости делать лишние проверки на &lt;code&gt;null&lt;&#x2F;code&gt; в местах со значением по умолчанию.&lt;&#x2F;p&gt;
+&lt;p&gt;Бывает, что нет возможности выделить тип в самостоятельный объект, но при этом он используется по всему проекту. Чтобы не ошибиться в очередной раз при описании типа, можно использовать алиасы типов.
+Взять тот же пример с &lt;strong&gt;int8&lt;&#x2F;strong&gt;, при наборе которого можно ошибиться в диапазоне значений, – хороший кандидат для алиаса.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @psalm-type Int8 = int&amp;lt;-128, 127&amp;gt; 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Type
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Int8
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public static function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;assertInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;gt;= -&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;128 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;lt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;127&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;        }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;throw new &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;InvalidArgumentException&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;quot;The {$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;v&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;} not valid int8.&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @psalm-import-type Int8 from Type
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Buffer
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Int8 $v
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;pack&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;c&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$v&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$buffer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Buffer&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$buffer&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;writeInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Type&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;assertInt8&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;));
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Мы использовали тип несколько раз, но описали – один.&lt;&#x2F;p&gt;
+&lt;p&gt;Что если мы уверены, что проверили границы типа, но при этом сам тип остался общим? Можно объяснить это с помощью специальной аннотации &lt;code&gt;[phpstan|psalm]-assert-if-[true|false]&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Node
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;public readonly &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$name&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-assert-if-true non-empty-string $this-&amp;gt;name
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;isNotEmpty&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;&amp;#39; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;!== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; non-empty-string $name
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;takesOnlyNonEmptyString&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$name&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;void
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $name&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$node &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Node&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;test&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$node&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isNotEmpty&lt;&#x2F;span&gt;&lt;span&gt;()) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;takesOnlyNonEmptyString&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$node&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;В данном случае тип поля &lt;code&gt;$name&lt;&#x2F;code&gt; остался прежним – &lt;code&gt;string&lt;&#x2F;code&gt;, – но благодаря аннотации мы доказали статанализатору, что границы типа были проверены.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;generics&quot; class=&quot;header title&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;kafkiansky.github.io&#x2F;php-stan&#x2F;#generics&quot;&gt;Дженерики&lt;&#x2F;a&gt;&lt;&#x2F;h3&gt;
+&lt;p&gt;Говорят, если произнести слово «дженерики», вас обязательно спросят, когда они появятся в PHP. А они есть. Причём в том виде, в котором они есть в других языках, — статическом.
+В компилируемых языках дженериков также не существует в рантайме, так как они стираются компилятором и заменяются на реальные типы.
+Заменяем компилятор на статанализатор и получаем то же самое – те же возможности и гарантии.&lt;&#x2F;p&gt;
+&lt;p&gt;Я не буду показывать пример с коллекциями – &lt;strong&gt;hello, world&lt;&#x2F;strong&gt; из мира дженериков, – а вместо этого давайте попробуем реализовать тип &lt;code&gt;Option&lt;&#x2F;code&gt; из &lt;strong&gt;Rust&lt;&#x2F;strong&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;Option&lt;&#x2F;code&gt; – это супертип для типов &lt;code&gt;Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt; и &lt;code&gt;None&lt;&#x2F;code&gt;, который вынуждает вас явно обрабатывать отсутствие значения в отличие от &lt;code&gt;null&lt;&#x2F;code&gt;, способному привести к
+&lt;a href=&quot;https:&#x2F;&#x2F;www.infoq.com&#x2F;presentations&#x2F;Null-References-The-Billion-Dollar-Mistake-Tony-Hoare&#x2F;&quot; target=&quot;_blank&quot;&gt;неприятным последствиям&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract class &lt;&#x2F;span&gt;&lt;span&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template-extends Option&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Some &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;extends &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-pure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@internal 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; T $value
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;private readonly mixed $value&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    ) {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;    
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;value&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template-extends Option&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;None &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;extends &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-pure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@internal 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;__construct&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;    
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;never
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;throw new &lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;RuntimeException&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;None unwrapped.&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;На данный момент мы имеем простой тип, который пока еще не сильно лучше &lt;code&gt;nullable&lt;&#x2F;code&gt; типа, потому что тоже бросает исключение. Добавим сахара:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract class &lt;&#x2F;span&gt;&lt;span&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-pure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @template E
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-param E $value
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Some&amp;lt;E&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final public static function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed $value&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Some
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Some&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$value&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-pure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @template E
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; None&amp;lt;E&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final public static function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;none&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;None
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;None&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-assert-if-true T $this-&amp;gt;unwrap()
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-this-out Some&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;isSome&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;instanceof &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Some&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-this-out None&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;isNone&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;instanceof &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;None&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-if-this-is Some&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;mixed&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Теперь такой код не будет пропущен статанализатором:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Option&amp;lt;positive-int&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;200&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(); &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; ERROR: IfThisIsMismatch - 139:16 - Class type must be Some&amp;lt;T:Option as mixed&amp;gt; current type Option&amp;lt;int&amp;lt;1, max&amp;gt;&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Дело в том, что теперь метод &lt;code&gt;unwrap&lt;&#x2F;code&gt; можно вызывать только на типе &lt;code&gt;Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;, а на данном этапе типом переменной &lt;code&gt;$option&lt;&#x2F;code&gt; является тип &lt;code&gt;Option&amp;lt;positive-int&amp;gt;&lt;&#x2F;code&gt;,
+что не соответствует ограничениям аннотации &lt;code&gt;@psalm-if-this-is Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;. Чтобы вызвать метод &lt;code&gt;unwrap&lt;&#x2F;code&gt; без ошибок от статанализитора, вам необходимо проверить, что в &lt;code&gt;Option&lt;&#x2F;code&gt; лежит действительно &lt;code&gt;Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Option&amp;lt;positive-int&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;200&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isSome&lt;&#x2F;span&gt;&lt;span&gt;()) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;() &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;200&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Когда вы вызываете метод &lt;code&gt;isSome&lt;&#x2F;code&gt;, тип объекта с &lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt; сужается до &lt;code&gt;Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;, благодаря аннотации &lt;code&gt;@psalm-this-out Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;Также вы не можете вызывать метод &lt;code&gt;unwrap&lt;&#x2F;code&gt;, если &lt;code&gt;isNone()&lt;&#x2F;code&gt; будет утвердительным:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; Option&amp;lt;positive-int&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;200&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isNone&lt;&#x2F;span&gt;&lt;span&gt;()) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(); &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; ERROR: NoValue - 140:7 - All possible types for this argument were invalidated - This may be dead code
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Таким образом, вы либо явно проверяете, что значение существует, и используете его, либо явно затыкаете статанализатор.
+Оба варианта если и не избавляют от багов полностью (в конце концов, вы можете обмануть статанализатор аннотациями), то по крайней мере заставляют
+вас подумать о том, что вы делаете. &lt;&#x2F;p&gt;
+&lt;p&gt;Добавим еще немного методов:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;php&quot; style=&quot;background-color:#ffffff;color:#333333;&quot; class=&quot;language-php &quot;&gt;&lt;code class=&quot;language-php&quot; data-lang=&quot;php&quot;&gt;&lt;span&gt;&amp;lt;?php
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;declare&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;strict_types&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract class &lt;&#x2F;span&gt;&lt;span&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@param&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; callable(T): bool $f
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;isSomeAnd&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;callable &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$f&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isSome&lt;&#x2F;span&gt;&lt;span&gt;() ? $&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;f&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;()) : &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;false&lt;&#x2F;span&gt;&lt;span&gt;; 
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @template Te
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-param \Closure(T): Te       $onSome
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-param (\Closure(): Te)|null $onNone
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * @psalm-return ($onNone is null ? Option&amp;lt;T&amp;gt; : Some&amp;lt;T&amp;gt;)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;abstract public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onSome&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;?&lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onNone &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;null&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template-extends Option&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;None &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;extends &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onSome&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;?&lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onNone &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;null&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;null &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;!== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$onNone&lt;&#x2F;span&gt;&lt;span&gt; ? &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;self&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;($&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;onNone&lt;&#x2F;span&gt;&lt;span&gt;()) : &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;self&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;none&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template T
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; * @template-extends Option&amp;lt;T&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt; *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;final class &lt;&#x2F;span&gt;&lt;span&gt;Some &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;extends &lt;&#x2F;span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;**
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     * {&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;@inheritdoc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;     *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;public function &lt;&#x2F;span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onSome&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;?&lt;&#x2F;span&gt;&lt;span&gt;\&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Closure $onNone &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;null&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;Option
+&lt;&#x2F;span&gt;&lt;span&gt;    {
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;self&lt;&#x2F;span&gt;&lt;span&gt;::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;some&lt;&#x2F;span&gt;&lt;span&gt;($&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;onSome&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#df5000;&quot;&gt;$this&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;value&lt;&#x2F;span&gt;&lt;span&gt;));
+&lt;&#x2F;span&gt;&lt;span&gt;    }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;doRequest&lt;&#x2F;span&gt;&lt;span&gt;();
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$another &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code&lt;&#x2F;span&gt;&lt;span&gt;);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$another&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isSome&lt;&#x2F;span&gt;&lt;span&gt;()) {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo $another&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(); &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; OK
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option&lt;&#x2F;span&gt;&lt;span&gt;-&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;isSomeAnd&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;bool &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;200&lt;&#x2F;span&gt;&lt;span&gt;)) {
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo &lt;&#x2F;span&gt;&lt;span style=&quot;color:#183691;&quot;&gt;&amp;#39;Ok&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; OK
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;echo 200 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$option
+&lt;&#x2F;span&gt;&lt;span&gt;    -&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;map&lt;&#x2F;span&gt;&lt;span&gt;(
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code&lt;&#x2F;span&gt;&lt;span&gt;): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;string&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;$code&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span&gt;(): &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;int &lt;&#x2F;span&gt;&lt;span&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;500&lt;&#x2F;span&gt;&lt;span&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;    )
+&lt;&#x2F;span&gt;&lt;span&gt;    -&amp;gt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#0086b3;&quot;&gt;unwrap&lt;&#x2F;span&gt;&lt;span&gt;(); &lt;&#x2F;span&gt;&lt;span style=&quot;color:#969896;&quot;&gt;&#x2F;&#x2F; OK
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Обратите внимание, что на последнем выражении мы можем вызывать &lt;code&gt;unwrap&lt;&#x2F;code&gt; сразу же, без проверки на &lt;code&gt;isSome&lt;&#x2F;code&gt;. Это доступно благодаря условным возвращаемым типам, а именно аннотации &lt;code&gt;@psalm-return ($onNone is null ? Option&amp;lt;T&amp;gt; : Some&amp;lt;T&amp;gt;)&lt;&#x2F;code&gt;,
+которая говорит, что, если мы никак не обработали тип &lt;code&gt;None&lt;&#x2F;code&gt;, то вернется базовый тип &lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;, в обратном случае всегда вернется &lt;code&gt;Some&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;.
+Таким образом мы получили мощный тип на основе дженериков, который можно использовать в качестве безопасной альтернативы &lt;code&gt;nullable&lt;&#x2F;code&gt; типам.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;are-we-without-bugs-now&quot; class=&quot;header title&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;kafkiansky.github.io&#x2F;php-stan&#x2F;#are-we-without-bugs-now&quot;&gt;Теперь наш проект защищён от багов?&lt;&#x2F;a&gt;&lt;&#x2F;h3&gt;
+&lt;p&gt;Нет. Но теперь от валидации мы ушли к парсингу: каждая функция, вызывающая другую функцию, должна будет гарантировать сходимость типов аргументов, что избавляет
+от необходимости делать это несколько раз и дает больше информации о типах. Другими словами, мы по-прежнему должны проверять, что работаем с позитивным числом, не пустой строкой,
+массивом с определенными ключами, итератором конкретного типа, но теперь информация о значениях находится не (или не только) в валидации, но в самих типах.
+На эту тему советую замечательную статью &lt;a href=&quot;https:&#x2F;&#x2F;lexi-lambda.github.io&#x2F;blog&#x2F;2019&#x2F;11&#x2F;05&#x2F;parse-don-t-validate&#x2F;&quot; target=&quot;_blank&quot;&gt;Parse, don’t validate&lt;&#x2F;a&gt;, в которой приведено больше аргументов в пользу такого подхода.&lt;&#x2F;p&gt;
+&lt;p&gt;Однако статический анализ полезен не только в контексте парсинга типов: его возможности безграничны. Так, манипулируя AST представлением нашего кода, мы можем собирать много полезной информации о нем, используя систему плагинов статанализаторов.
+Позже эту информацию можно пустить на организацию разного рода ограничений и проверок, специфичных для вашего проекта или фреймворка.
+Осознав это, становится понятно, почему статический анализ популярен и для компилируемых языков, в которых, как кажется, компиляторы и так должны от всего защищать.
+Вы не будете добавлять в компилятор запрет на инициализацию массивов без ранней аллокации памяти, потому что с точки зрения компилятора это не ошибка,
+а с точки зрения статанализатора, который руководствуется собирательным опытом сотни разработчиков, – да, поскольку это может привести к деградации производительности программы.
+Иначе говоря, компилятор про ошибки, которые невозможно игнорировать, а статический анализатор про ошибки, которые можно подавлять (на свой страх и риск).&lt;&#x2F;p&gt;
+&lt;p&gt;Например, вы можете поставить плагин к псалму, запрещающий использование конструкции &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;marartner&#x2F;psalm-no-empty&quot; target=&quot;_blank&quot;&gt;empty&lt;&#x2F;a&gt; из-за ее интересных &lt;a href=&quot;https:&#x2F;&#x2F;www.beberlei.de&#x2F;post&#x2F;when_to_use_empty_in_php_i_say_never&quot; target=&quot;_blank&quot;&gt;особенностей&lt;&#x2F;a&gt;.
+Можно ли провернуть такое на уровне интерпретатора? Нет, потому что это груз истории языка, который невозможно снять без того, чтобы не сломать половину проектов. На это просто никто не пойдет.&lt;&#x2F;p&gt;
+&lt;p&gt;Или &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;boesing&#x2F;psalm-plugin-stringf&quot; target=&quot;_blank&quot;&gt;плагин&lt;&#x2F;a&gt; для валидации &lt;code&gt;sprintf&lt;&#x2F;code&gt;, &lt;code&gt;printf&lt;&#x2F;code&gt; и похожих функций на правильное количество и типы аргументов. И пусть это не кажется вам мелочью,
+потому что такая конструкция &lt;code&gt;sprintf(&#x27;The message is %s&#x27;)&lt;&#x2F;code&gt; кинет исключение &lt;code&gt;ArgumentCountError&lt;&#x2F;code&gt; прямо в рантайме, с чем я однажды столкнулся, когда нашел код, где в &lt;code&gt;catch&lt;&#x2F;code&gt; блоке обрабатывалось исключение с неправильно написанным &lt;code&gt;sprintf&lt;&#x2F;code&gt;, что порождало другое исключение,
+которое уже никто не перехватывал. Например, в &lt;strong&gt;Rust&lt;&#x2F;strong&gt; такое валидируется на этапе компиляции. Попробуйте кусочек раста у себя: поставьте плагин.&lt;&#x2F;p&gt;
+&lt;p&gt;Вы можете запрещать или валидировать не только функции, но и целые пласты кода. Например, &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;kafkiansky&#x2F;service-locator-interrupter&quot; target=&quot;_blank&quot;&gt;плагин&lt;&#x2F;a&gt; для Laravel, запрещающий использование сервис-локаторов в любом их представлении: в виде фасадов, функций, контейнеров.&lt;&#x2F;p&gt;
+&lt;p&gt;Или тоже &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;kafkiansky&#x2F;better-laravel&quot; target=&quot;_blank&quot;&gt;плагин&lt;&#x2F;a&gt; для Laravel, в котором среди прочего есть линтер для валидации наличия конфига по вложенным ключам (дот-нотация),
+опечатка в которых может привести к багам на проде.&lt;&#x2F;p&gt;
+&lt;p&gt;Таким образом, с помощью статанализатора и плагинов вы можете навернуть столько проверок вашего кода, что успешное прохождение &lt;code&gt;CI&lt;&#x2F;code&gt; будет гарантировать чуть ли не полную работоспособность программы.&lt;&#x2F;p&gt;
+&lt;p&gt;По этой причине в PHP не нужны ни &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;PHPGenerics&#x2F;php-generics-rfc&#x2F;issues&#x2F;45&quot; target=&quot;_blank&quot;&gt;нативные дженерики&lt;&#x2F;a&gt;, ни больше &lt;a href=&quot;https:&#x2F;&#x2F;wiki.php.net&#x2F;rfc&#x2F;true-type&quot; target=&quot;_blank&quot;&gt;нативных типов&lt;&#x2F;a&gt;,
+потому что все это давно уже есть в статических анализаторах, до возможностей которых интерпретатор придется очень долго дорабатывать, рискуя повторить историю &lt;strong&gt;Go&lt;&#x2F;strong&gt;,
+в котором дженерики на сегодняшний день получились, мягко говоря, не тем, к чему все привыкли. Кроме того, релизный цикл и фикс багов у статанализаторов происходит намного чаще, чем у языка, большие релизы которого происходят раз в год.
+И это не считая проблемы с командой разработки языка (особенно после ухода Никиты Попова), которая просто не в состоянии разрабатывать и поддерживать тот объем функций, которые уже сейчас дают статические анализаторы, поэтому выбор – использовать их или нет – довольно очевиден.&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>kafkiansky</title>
+          <pubDate>Thu, 01 Apr 2021 08:50:45 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://kafkiansky.github.io/authors/kafkiansky/</link>
+          <guid>https://kafkiansky.github.io/authors/kafkiansky/</guid>
+          <description>&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;kafkiansky&quot;&gt;@kafkiansky&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+</description>
+      </item>
+    </channel>
+</rss>
