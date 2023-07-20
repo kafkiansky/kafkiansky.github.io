@@ -250,39 +250,42 @@ a.toc-link:hover {
 }
 
 h1.title a:visited {
-  color: #000;
+  color: #777;
 }
 
 h1.title::before {
   content: "# ";
+  color: #777;
 }
 
 h1.title a {
-  color: #000;
+  color: #777;
 }
 
 h2.title a:visited {
-  color: #000;
+  color: #777;
 }
 
 h2.title::before {
   content: "# ";
+  color: #777;
 }
 
 h2.title a {
-  color: #000;
+  color: #777;
 }
 
 h3.title a:visited {
-  color: #000;
+  color: #777;
 }
 
 h3.title::before {
   content: "# ";
+  color: #777;
 }
 
 h3.title a {
-  color: #000;
+  color: #777;
 }
 
 a:hover {
