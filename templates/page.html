@@ -1,57 +1,59 @@
-{# Default page.html template #}
+{% extends "basic.html" %}
 
-{% extends "base.html" %}
-
-{% block seo %}
-  {{ super() }}
-  {% set title_addition = "" %}
-  {% if page.title and config.title %}
-    {% set title = page.title %}
-    {% set title_addition = title_separator ~ config.title %}
-  {% elif page.title %}
-    {% set title = page.title %}
-  {% else %}
-    {% set title = config.title %}
-  {% endif %}
-  
-  {% if page.description %}
-    {% set description = page.description %}
-  {% else %}
-    {% set description = config.description %}
-  {% endif %}
-  {% set created_time = page.date %}
-  {% set updated_time = page.updated %}
-  {% if current_section %}
-    {% set page_section = current_section %}
-  {% else %}
-    {% set page_section = "" %}
-  {% endif %}
-  
-  {{ macros_head::seo(title=title, title_addition=title_addition, description=description, type="article", is_page=true, created_time=created_time, updated_time=updated_time, page_section=page_section) }}
-{% endblock seo %}
-  
-{% block body %}
-  {% if section.extra.class %}
-    {% set page_class = page.extra.class %}
-  {% else %}
-    {% set page_class = "page single" %}
-  {% endif %}
-{% endblock body %}
+{% block title %}{{ config.title }} • {{ page.title }}{% endblock title %}
 
 {% block content %}
-<div class="wrap container" role="document">
-  <div class="content">
-    <div class="row justify-content-center">
-      <div class="col-md-12 col-lg-10 col-xxl-8">
-        <article>
-          <div class="page-header">
-            <h1>{{ page.title }}</h1>
-          </div>
-          {% if page.extra.lead %}<p class="lead">{{ page.extra.lead }}</p>{% endif %}
-          {{ page.content | safe }}
-        </article>
+<article class="post">
+  <h1>{{ page.title }}</h1>
+  <strong>{{ page.reading_time }}&nbsp;min read</strong>
+  <div class="post-content">
+    {% if page.extra.lead %}
+      {{ page.extra.lead | safe}}
+    {% endif %}
+    {{ page.content | safe }}
+  </div>
+  <div class="post-footer">
+    <div class="meta">
+      <div class="info">
+        {% if page.date %}
+        <i class="far fa-sun"></i><span class="date">{{ page.date | date(format=trans(key="date_format", lang=lang))
+          }}</span>
+        {% endif %}
+        {% if page.taxonomies.tags %}
+        <i class="fas fa-tags"></i>
+        {% for tag in page.taxonomies.tags %}
+        <a class="tag" href="{{ get_url(path=" @/_index.md", lang=lang) }}tags/{{tag}}">&nbsp;{{tag}}</a>
+        {% endfor %}
+        {% endif %}
       </div>
     </div>
   </div>
-</div>
+</article>
+{% if page.extra.mathjax %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['$$', '$$'], ["\\[", "\\]"]],
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/{{ page.extra.mathjax }}-chtml.js">
+  </script>
+{% endif %}
+{% if page.extra.tikzjax %}
+<link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+<style>
+  .tikz>svg {
+    overflow: visible;
+  }
+</style>
+<script src="{{ get_url(path=" js/tikzjax.js", trailing_slash=false) }}"></script>
+{% endif %}
+{% if page.extra.mermaid %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
+{% endif %}
 {% endblock content %}
