@@ -1,0 +1,10 @@
+version: '3.0'
+
+services:
+  zola:
+    image: ghcr.io/getzola/zola:v0.18.0
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./:/app
+    command: --root /app serve --drafts --interface 0.0.0.0 --port 8000
