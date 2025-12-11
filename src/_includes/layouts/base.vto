@@ -4,11 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ it.title || metas.title }} - {{ metas.site }}</title>
-
-    <meta name="supported-color-schemes" content="light dark">
-    <meta name="theme-color" content="hsl(220, 20%, 100%)" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="hsl(220, 20%, 10%)" media="(prefers-color-scheme: dark)">
+    <title>{{ if it.title }} {{ it.title }} {{ else }} {{ metas.site }} {{ /if }}</title>
     
     <link rel="stylesheet" href="/styles.css">
     <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="{{ metas.site }}">
@@ -32,7 +28,11 @@
       {{- for link of it.menu_links }}
         <li>
           <a href="{{ link.href }}"{{ if link.target }} target="{{link.target}}"{{ /if }}>
-            {{ link.text }}
+            {{ if link.img }}
+              <img src="{{ link.img.icon |> icon(link.img.source, "solid") }}">
+            {{ else }}
+              {{ link.text }}
+            {{ /if }}
           </a>
         </li>
       {{ /for }}

@@ -13,6 +13,7 @@ import { merge } from "lume/core/utils/object.ts";
 import toc from "https://deno.land/x/lume_markdown_plugins@v0.9.0/toc.ts";
 import image from "https://deno.land/x/lume_markdown_plugins@v0.9.0/image.ts";
 import footnotes from "https://deno.land/x/lume_markdown_plugins@v0.9.0/footnotes.ts";
+import icons from "lume/plugins/icons.ts";
 import "npm:prismjs@1.29.0/components/prism-less.js";
 import "npm:prismjs@1.29.0/components/prism-git.js";
 import "npm:prismjs@1.29.0/components/prism-clike.js";
@@ -67,6 +68,22 @@ export default function (userOptions?: Options) {
             .use(pagefind(options.pagefind))
             .use(sitemap())
             .use(feed(options.feed))
+            .use(icons({
+                catalogs: [
+                    {
+                        id: "bootstrap",
+                        src: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/icons/{name}.svg"
+                    },
+                    {
+                        id: "simpleicons",
+                        src: "https://cdn.jsdelivr.net/npm/simple-icons@15.21.0/icons/{name}.svg"
+                    },
+                    {
+                        id: "feather",
+                        src: "https://cdn.jsdelivr.net/npm/feather-icons@4.29.2/dist/icons/{name}.svg"
+                    },
+                ]
+            }))
             .add("fonts")
             .add([".css"])
             .add("js")

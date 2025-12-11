@@ -56,3 +56,8 @@ main {
 .year-posts article+article {
   margin-top: 0.1rem !important;
 }
+
+.navbar-links a {
+  text-decoration: none;
+  color: inherit;
+}

@@ -6,10 +6,8 @@ export type { Options } from "./plugins.ts";
 
 export default function (options: Partial<Options> = {}) {
   return (site: Lume.Site) => {
-    // Configure the site
     site.use(plugins(options));
 
-    // Add remote files
     const files = [
       "_includes/css/fonts.css",
       "_includes/css/navbar.css",
