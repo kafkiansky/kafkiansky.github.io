@@ -10,7 +10,8 @@
   --color-link-hover: var(--color-dim);
 }
 
-html, body {
+html,
+body {
   background-color: #f0fff4;
 }
 
@@ -26,4 +27,32 @@ main {
 
 .search {
   margin-top: var(--row-gap-xsmall);
+}
+
+.year-block {
+  margin-top: 2rem;
+}
+
+.year-block:first-child {
+  margin-top: 0;
+}
+
+.year-posts {
+  margin-top: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0 !important;
+}
+
+.year-posts .post,
+.year-posts article,
+.year-posts .post-header,
+.year-posts .post-title {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.year-posts .post+.post,
+.year-posts article+article {
+  margin-top: 0.1rem !important;
 }

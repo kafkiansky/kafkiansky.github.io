@@ -5,16 +5,31 @@ title: kafkiansky
 ---
 
 <section class="postList">
-  {{ for post of search.pages("type=post", "date=desc", 3) }}
-  <article class="post">
-    <header class="post-header">
-      <h2 class="post-title">
-        <a href="{{ post.url }}" {{ if post.url == url }} aria-current="page"{{ /if }}>
-          {{ post.title || post.url }}
-        </a>
-        <span class="post-date">{{ post.date.toLocaleDateString('ru-RU').replace(/\./g, '/') }}</span>
-      </h2>
-    </header>
-  </article>
-{{ /for }}
+  {{ for year of Array.from(new Set(
+        search.pages("type=post").map(p => new Date(p.date).getFullYear())
+      )).sort((a, b) => b - a) }}
+
+    <div class="year-block">
+      <h2 class="year-title">{{ year }}</h2>
+
+      <div class="year-posts">
+        {{ for post of search.pages("type=post", "date=desc")
+            .filter(p => new Date(p.date).getFullYear() === year) }}
+          <article class="post">
+            <header class="post-header">
+              <h2 class="post-title">
+                <a href="{{ post.url }}" {{ if post.url == url }} aria-current="page"{{ /if }}>
+                  {{ post.title || post.url }}
+                </a>
+                <span class="post-date">
+                  {{ new Date(post.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }).replace(/\./g, '/') }}
+                </span>
+              </h2>
+            </header>
+          </article>
+        {{ /for }}
+      </div>
+    </div>
+
+  {{ /for }}
 </section>
