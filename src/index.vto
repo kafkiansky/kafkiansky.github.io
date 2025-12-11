@@ -5,21 +5,16 @@ title: kafkiansky
 ---
 
 <section class="postList">
-{{ for year of years }}
-<h2>{{ year }}</h2>
-{{ for post of posts[year] }}
-<article class="post">
+  {{ for post of search.pages("type=post", "date=desc", 3) }}
+  <article class="post">
     <header class="post-header">
       <h2 class="post-title">
         <a href="{{ post.url }}" {{ if post.url == url }} aria-current="page"{{ /if }}>
           {{ post.title || post.url }}
         </a>
-        <span class="post-date">
-            {{ post.date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }).replace(/\./g, '/') }}
-        </span>
+        <span class="post-date">{{ post.date.toLocaleDateString('ru-RU').replace(/\./g, '/') }}</span>
       </h2>
     </header>
   </article>
-{{ /for }}
 {{ /for }}
 </section>
