@@ -19,7 +19,7 @@ import "npm:prismjs@1.29.0/components/prism-git.js";
 import "npm:prismjs@1.29.0/components/prism-clike.js";
 import "npm:prismjs@1.29.0/components/prism-markup-templating.js";
 import "npm:prismjs@1.29.0/components/prism-php.js";
-import "npm:prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.js";
+import "npm:prismjs@1.29.0/components/prism-go.js";
 
 import "lume/types.ts";
 
@@ -32,8 +32,7 @@ export interface Options {
 
 export const defaults: Options = {
     prism: {
-        plugins: ["line-numbers"],
-        languages: ["php", "javascript", "html", "css"],
+        languages: ["php", "go"],
         css: "prism.css",
         js: "prism.js",
     },
@@ -71,14 +70,6 @@ export default function (userOptions?: Options) {
             .use(icons({
                 catalogs: [
                     {
-                        id: "bootstrap",
-                        src: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/icons/{name}.svg"
-                    },
-                    {
-                        id: "simpleicons",
-                        src: "https://cdn.jsdelivr.net/npm/simple-icons@15.21.0/icons/{name}.svg"
-                    },
-                    {
                         id: "feather",
                         src: "https://cdn.jsdelivr.net/npm/feather-icons@4.29.2/dist/icons/{name}.svg"
                     },
@@ -96,8 +87,6 @@ export default function (userOptions?: Options) {
                         /<!--\s*more\s*-->/i,
                     )[0];
                 }
-            })
-            ;
-        ;
+            });
     };
 }

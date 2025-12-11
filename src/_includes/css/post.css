@@ -8,6 +8,9 @@
     margin: 0 0 0.2em;
     text-wrap: balance;
     color: var(--color-base);
+    font-size: 2.2rem;
+    line-height: 1.3;
+    font-weight: 700;
 }
 
 .post-details {
@@ -53,40 +56,38 @@
     display: inline-block;
 }
 
-/* Line numbers - гарантированно рабочие */
-pre[class*="language-"].line-numbers {
-    position: relative;
-    padding-left: 3.8em;
-    counter-reset: linenumber;
-    overflow: visible;
+pre[class*="language-"],
+code[class*="language-"] {
+    background-color: rgba(0, 0, 0, 0.015);
+    border: none;
+    box-shadow: none;
+    border-radius: 6px;
+    margin: 0;
+    overflow-x: auto;
+    line-height: 1.5;
 }
 
-pre[class*="language-"].line-numbers>code {
-    position: relative;
-    white-space: inherit;
+pre[class*="language-"] {
+    padding: 0.8em 1em !important;
+    text-indent: 0 !important;
 }
 
-.line-numbers .line-numbers-rows {
-    position: absolute;
-    pointer-events: none;
-    top: 0;
-    font-size: 100%;
-    left: -3.8em;
-    width: 3em;
-    letter-spacing: -1px;
-    border-right: 1px solid #999;
-    user-select: none;
-}
-
-.line-numbers-rows>span {
+pre[class*="language-"]>code {
     display: block;
-    counter-increment: linenumber;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
 }
 
-.line-numbers-rows>span::before {
-    content: counter(linenumber);
-    color: #999;
-    display: block;
-    padding-right: 0.8em;
-    text-align: right;
+pre[class*="language-"] *,
+.line-numbers .line-numbers-rows,
+.line-highlight {
+    background: none !important;
+    border: none !important;
+}
+
+code {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
 }

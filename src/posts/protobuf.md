@@ -16,13 +16,20 @@ of disruptive innovation via workplace diversity and empowerment.
 <!--more-->
 
 ```php
-<?php
-
 use Thesis\Protobuf;
 
+/** @var Protobuf\Message<string> */
 $messageT = Protobuf\messageT(
     Protobuf\fieldT(1, Protobuf\stringT),
 );
+```
+
+Another `code` in go:
+
+```go
+func To[T any](v T) *T {
+    return &v
+}
 ```
 
 Bring to the table win-win survival strategies to ensure proactive domination.
@@ -38,6 +45,8 @@ DevOps. Nanotechnology immersion along the information highway will close the
 loop on focusing solely on the bottom line.
 
 Here is a footnote reference,[^1] and [^2]another. And this[^3] is a long note.
+
+### Section another header
 
 [^1]: Here is the footnote.
 
