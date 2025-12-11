@@ -8,11 +8,17 @@
 :root {
   --color-link: var(--color-base);
   --color-link-hover: var(--color-dim);
+  --font-body: "PT Serif", serif !important;
 }
+
+/* google-fonts */
 
 html,
 body {
-  background-color: #f0fff4;
+  background-color: #dbffe5;
+  font-family: "PT Serif", serif;
+  font-size: 20px !important;
+  line-height: 1.6 !important;
 }
 
 main {

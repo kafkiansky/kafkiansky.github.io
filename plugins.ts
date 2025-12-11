@@ -14,6 +14,7 @@ import toc from "https://deno.land/x/lume_markdown_plugins@v0.9.0/toc.ts";
 import image from "https://deno.land/x/lume_markdown_plugins@v0.9.0/image.ts";
 import footnotes from "https://deno.land/x/lume_markdown_plugins@v0.9.0/footnotes.ts";
 import icons from "lume/plugins/icons.ts";
+import googleFonts from "lume/plugins/google_fonts.ts";
 import "npm:prismjs@1.29.0/components/prism-less.js";
 import "npm:prismjs@1.29.0/components/prism-git.js";
 import "npm:prismjs@1.29.0/components/prism-clike.js";
@@ -74,6 +75,13 @@ export default function (userOptions?: Options) {
                         src: "https://cdn.jsdelivr.net/npm/feather-icons@4.29.2/dist/icons/{name}.svg"
                     },
                 ]
+            }))
+            .use(googleFonts({
+                cssFile: "styles.css",
+                placeholder: "/* google-fonts */",
+                fonts: {
+                    code: "https://fonts.google.com/share?selection.family=JetBrains+Mono:ital,wght@0,100..800;1,100..800",
+                },
             }))
             .add("fonts")
             .add([".css"])

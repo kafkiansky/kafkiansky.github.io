@@ -7,7 +7,7 @@ bodyClass: body-post
     <h1 class="post-title">{{ title }}</h1>
   </header>
 
-  {{ if toc.length }}
+  {{# {{ if toc.length }}
   <nav class="toc">
     <ol>
       {{ for item of toc }}
@@ -27,7 +27,7 @@ bodyClass: body-post
       {{ /for }}
     </ol>
   </nav>
-  {{ /if }}
+  {{ /if }} #}}
 
   <div class="post-body body">
     {{ content }}
