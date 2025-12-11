@@ -1,0 +1,10 @@
+services:
+  deno:
+    build:
+      context: docker/deno
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    command: sh -c 'trap "exit 0" TERM; tail -f /dev/null & wait'

@@ -1,0 +1,12 @@
+lang: en
+
+menu_links:
+  - text: rss
+    href: /feed.xml
+extra_head: []
+
+metas:
+  site: kafkiansky
+  title: "=title"
+  image: "=image"
+  lang: en

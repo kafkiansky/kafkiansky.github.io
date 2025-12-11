@@ -1,0 +1,29 @@
+@import "https://unpkg.com/@lumeland/ds@0.5.2/ds.css";
+
+@import "css/navbar.css";
+@import "css/page.css";
+@import "css/post-list.css";
+@import "css/post.css";
+
+:root {
+  --color-link: var(--color-base);
+  --color-link-hover: var(--color-dim);
+}
+
+html, body {
+  background-color: #f0fff4;
+}
+
+main {
+  padding: var(--row-gap-medium) 0;
+  max-width: min(100% - 15vw, 45em);
+  margin: 0 auto;
+
+  &> :first-child {
+    margin-top: 0;
+  }
+}
+
+.search {
+  margin-top: var(--row-gap-xsmall);
+}

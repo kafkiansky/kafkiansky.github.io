@@ -1,0 +1,92 @@
+.post-header {
+    margin-bottom: var(--row-gap-small);
+}
+
+.post-title {
+    font: var(--font-display);
+    letter-spacing: var(--font-display-spacing);
+    margin: 0 0 0.2em;
+    text-wrap: balance;
+    color: var(--color-base);
+}
+
+.post-details {
+    display: flex;
+    flex-flow: row wrap;
+    row-gap: 1em;
+    column-gap: 0.5em;
+    align-items: center;
+    font: var(--font-small);
+    color: var(--color-dim);
+
+    & p {
+        margin: 0;
+    }
+
+    & p::after {
+        content: "•";
+        padding-left: 0.5em;
+        align-self: stretch;
+    }
+
+    & p:last-of-type {
+        margin-right: 0.5em;
+
+        &::after {
+            display: none;
+        }
+    }
+
+    & a {
+        color: inherit;
+    }
+}
+
+.post-tags {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.post-link {
+    display: inline-block;
+}
+
+/* Line numbers - гарантированно рабочие */
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+    overflow: visible;
+}
+
+pre[class*="language-"].line-numbers>code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+    user-select: none;
+}
+
+.line-numbers-rows>span {
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows>span::before {
+    content: counter(linenumber);
+    color: #999;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+}
