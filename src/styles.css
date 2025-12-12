@@ -18,8 +18,17 @@ body {
   background-color: #ffff !important;
   font-weight: 400;
   font-family: "PT Serif", serif;
-  font-size: 20px !important;
-  line-height: 1.6 !important;
+  font-size: 19px;
+  line-height: 1.65;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: #111;
 }
 
 main {
