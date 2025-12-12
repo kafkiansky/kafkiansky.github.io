@@ -62,6 +62,20 @@
     font-weight: 400;
 }
 
+.post ul,
+.post ol,
+.post li {
+    font-family: "PT Serif", serif !important;
+    font-size: 20px !important;
+    color: #000 !important;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+}
+
+.post li::marker {
+    color: #000;
+}
+
 .post a,
 .post-content a,
 .content a {
@@ -84,7 +98,10 @@ code[class*="language-"] {
     border-radius: 6px;
     margin: 0;
     overflow-x: auto;
-    line-height: 1.5;
+    line-height: 1.45;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 pre[class*="language-"] {
@@ -110,4 +127,116 @@ code {
     background-color: #d0f9df;
     padding: 0.1em 0.4em;
     border-radius: 4px;
+}
+
+.post :not(pre)>code,
+.post-content :not(pre)>code {
+    background: transparent !important;
+    color: #000 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-size: 0.95em;
+}
+
+pre[class*="language-"],
+pre[class*="language-"] code {
+    background: #fff;
+    color: #000;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #998;
+    font-style: italic;
+}
+
+.token.keyword,
+.token.control,
+.token.operator,
+.token.directive {
+    color: #000;
+    font-weight: 500;
+}
+
+.token.function,
+.token.method {
+    color: #000 !important;
+    font-weight: 300;
+}
+
+.token.function-definition {
+    color: #8b0000 !important;
+    font-weight: 500;
+}
+
+.token.class-name {
+    color: #8b0000;
+    font-weight: 500;
+}
+
+.token.builtin {
+    color: #445588;
+    font-weight: 500;
+}
+
+.token.variable,
+.token.parameter,
+.token.property {
+    color: #0086b3;
+}
+
+.token.string,
+.token.char,
+.token.number {
+    color: #d72d2d;
+}
+
+.token.attr-value {
+    color: #8b0000;
+}
+
+pre[class*="language-"] .token.comment {
+    background-color: rgba(220, 245, 235, 0.35);
+    color: #7f7f7f;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+pre[class*="language-"] {
+    position: relative;
+}
+
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    font-size: 12px;
+    padding: 4px 8px;
+
+    border: none;
+    border-radius: 4px;
+
+    background: #f3f3f3;
+    color: rgba(0, 0, 0, 0.35);
+
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+pre[class*="language-"]:hover .copy-button {
+    opacity: 1;
+}
+
+.copy-button:hover {
+    color: #000;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.copy-button.copied {
+    background: #d1fae5;
+    color: #000;
 }
