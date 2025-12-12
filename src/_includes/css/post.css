@@ -56,9 +56,8 @@
 .post-content p {
     margin-bottom: 1.2em;
     font-family: "PT Serif", serif !important;
-    font-size: 20px !important;
+    font-size: 19px !important;
     color: #000 !important;
-    -webkit-font-smoothing: antialiased;
     font-weight: 400;
 }
 
@@ -66,7 +65,7 @@
 .post ol,
 .post li {
     font-family: "PT Serif", serif !important;
-    font-size: 20px !important;
+    font-size: 19px !important;
     color: #000 !important;
     -webkit-font-smoothing: antialiased;
     font-weight: 400;
