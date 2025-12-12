@@ -39,10 +39,6 @@
             display: none;
         }
     }
-
-    & a {
-        color: inherit;
-    }
 }
 
 .post-tags {
@@ -59,11 +55,29 @@
 .post p,
 .post-content p {
     margin-bottom: 1.2em;
+    font-family: "PT Serif", serif !important;
+    font-size: 20px !important;
+    color: #000 !important;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+}
+
+.post a,
+.post-content a,
+.content a {
+    color: #3366cc;
+    text-decoration: underline;
+}
+
+.post a:hover,
+.post-content a:hover,
+.content a:hover {
+    color: #000;
 }
 
 pre[class*="language-"],
 code[class*="language-"] {
-    background-color: rgba(0, 0, 0, 0.024);
+    background-color: #ffff;
     font-family: "code", monospace !important;
     border: none;
     box-shadow: none;
