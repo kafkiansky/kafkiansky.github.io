@@ -8,7 +8,7 @@
 :root {
   --color-link: var(--color-base);
   --color-link-hover: var(--color-dim);
-  --font-body: "test";
+  --font-body: "content";
 }
 
 /* google-fonts */
@@ -17,7 +17,7 @@ html,
 body {
   background-color: #ffff !important;
   font-weight: 400;
-  font-family: "test";
+  font-family: "content";
   font-size: 19px;
   line-height: 1.65;
 }
