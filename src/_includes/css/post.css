@@ -55,7 +55,7 @@
 .post p,
 .post-content p {
     margin-bottom: 1.2em;
-    font-family: "PT Serif", serif;
+    font-family: "test";
     font-size: 19px;
     color: #000;
     font-weight: 400;
@@ -65,7 +65,7 @@
 .post ul,
 .post ol,
 .post li {
-    font-family: "PT Serif", serif;
+    font-family: "test";
     font-size: 19px;
     color: #000;
     font-weight: 400;
