@@ -240,3 +240,61 @@ pre[class*="language-"]:hover .copy-button {
     background: #d1fae5;
     color: #000;
 }
+
+.post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.8em 0;
+  font-size: 0.95em;
+}
+
+.post-body thead th {
+  text-align: left;
+  font-weight: 600;
+  padding: 0.6em 0.8em;
+
+  border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.post-body tbody td {
+  padding: 0.6em 0.8em;
+  vertical-align: top;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.post-body tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.post-body th + th,
+.post-body td + td {
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.post-body table {
+  line-height: 1.5;
+}
+
+.post-body th {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.post-body table code {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.post-body tbody tr:hover {
+  background-color: rgba(220, 230, 240, 0.35);
+}
+
+.post-body table {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
