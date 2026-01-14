@@ -211,6 +211,271 @@ message Request {
 
 Хотя результат кодогенерации и то, как о группах и сообщениях принято было думать, были одинаковыми, сериализация между ними фундаментально отличалась. Если сообщения — это длина и байтовый буфер, соответствующий конкретной схеме, то группы длины не имели. Вместо этого они оборачивались в открывающий и закрывающий теги с разными типами и одним номером. Это позволяло не копить промежуточный буфер[^7] или как-либо еще считать длину вложенного сообщения, а писать одно поле за другим в общий буфер и даже использовать стриминг. Хотя такой способ имеет свои преимущества[^8] и используется в других протоколах вроде `amqp`, он плохо ложится на модель `protobuf`, в котором важно уметь быстро пропускать неизвестные поля. Кроме того, удаление групп идет на пользу консистентности формата, в котором сообщения уже были и выполняли ту же самую роль, которую на себя брали группы.
 
+Хорошо на сжатие в `protobuf` работают не только выбранные алгоритмы, но даже просто соглашения. Одно из них довольно важное — это соглашение о значениях по умолчанию. Нет смысла сериализовать такие значения, как `false`, `0`, `''`, `[]`, если их проще восстанавливать на принимающей стороне, исходя из уверенности, что они должны быть именно такими, если отправитель не указал ничего другого. По этой причине перечисления в `protobuf` должны иметь вариант с нулем, что обязательно для `proto3` и что вас заставит сделать `protoc`, если вы забудете, и что было настоятельной [рекомендацией](https://protobuf.dev/programming-guides/proto2/#enum-default) в `proto2`. Кроме того, значениями по умолчанию могут быть те, которые указаны в схеме — правда, только для `proto2`. Выглядело это следующим образом:
+```
+syntax = "proto2";
+
+message Request {
+  optional string name = 1 [default = "thesis"];
+}
+```
+
+Это работало только для примитивных типов, куда входят числа, строки, булево и, разумеется, `enum`, который, как вы уже должны были запомнить, является числом. Такие значения тоже не должны сериализоваться, хотя никакой ошибки в обратном случае не будет — как я уже сказал, это только соглашение.
+
+Когда вы указываете значение по умолчанию для поля с типом `enum`, вы указываете его вариант, не обращаясь к типу:
+
+```
+syntax = "proto2";
+
+enum Color {
+  UNSPECIFIED = 0;
+  RED = 1;
+}
+
+message Request {
+  optional Color color = 1 [default = RED];
+}
+```
+
+Кажется, непонятно, что будет, если между разными перечислениями окажутся варианты с одинаковым именем. Как хорошо, что эту проблему решает `protoc`: он запрещает одинаковые имена вариантов между всеми перечислениями в пакете. Связано это больше с особенностью кодогенерации на других языках, где такие варианты становятся константами, не имея контейнерного типа, как в `php`, где есть перечисления на уровне языка. Поэтому для вариантов перечислений есть соглашение использовать имя перечисления перед каждым вариантом:
+```
+enum Color {
+  COLOR_UNSPECIFIED = 0;
+  COLOR_RED = 1;
+}
+```
+
+Тогда уникальность обеспечивается именем перечисления. Впрочем, подробнее об именах будет написано в статье про кодогенерацию.
+
+Чтобы написать сериализацию, нужно ввести модель данных, на базе которой можно строить другие высокоуровневые инструменты вроде рефлексии, — пользоваться многословной моделью постоянно неудобно. Для модели нам достаточно типов и номеров. Из них мы сможем вывести тег и правильно (де) сериализовать значения. В качестве примера выразим модель гитхаба, в котором есть пользователи и организации, в которых они состоят и определенную в них роль занимают:
+```
+message Organization {
+  string name = 1;
+  string role = 2;
+}
+
+message User {
+  string username = 1;
+  repeated Organization organizations = 2;
+}
+```
+
+Переложив на [нашу](https://github.com/thesis-php/protobuf) модель, получим следующее:
+```php
+use Thesis\Protobuf;
+
+$organizationT = Protobuf\messageT(
+    Protobuf\fieldT(1, Protobuf\stringT), // name
+    Protobuf\fieldT(2, Protobuf\stringT), // role
+);
+
+$userT = Protobuf\messageT(
+    Protobuf\fieldT(1, Protobuf\stringT), // username
+    Protobuf\fieldT(2, Protobuf\listT($organizationT)), // organizations
+);
+```
+
+Тут стоит объяснить, зачем вообще нужна модель данных, если те же `json` и `msgpack` обходятся без нее. Потому что бывают протоколы сериализации, которые принято называть `schemaless`, схемы которых хранятся в самом формате, например `msgpack`, и протоколы, называемые `schema driven`, схемы которых хранятся отдельно, например в файле, если мы говорим про `avro`, или в самом коде, как в `protobuf`. Преимущество первых — в простоте: мы буквально в силах прочесть любые данные; преимущество вторых — в сжатии: на схему можно переложить много полезной информации, чаще всего статической, которая не будет занимать место в буфере. Так, в `protobuf` вместо имен можно указывать номера, а в `avro` использовать позицию в схеме в качестве смещения в буфере.
+
+Чтобы данные сериализовать, мы используем обратную модель, в которой, кроме типов, указаны реальные значения:
+```php
+use Thesis\Protobuf;
+
+$organization = Protobuf\messageT(
+    Protobuf\fieldT(1, Protobuf\stringT),
+    Protobuf\fieldT(2, Protobuf\stringT),
+);
+
+$message = Protobuf\message(
+    Protobuf\fieldOf(1, Protobuf\stringOf('kafkiansky')),
+    Protobuf\fieldOf(2, $organization->list([
+        Protobuf\message(
+            Protobuf\fieldOf(1, Protobuf\stringOf('thesis')),
+            Protobuf\fieldOf(2, Protobuf\stringOf('maintainer')),
+        ),
+    ]))
+);
+```
+
+Наша модель [основана](https://github.com/thesis-php/protobuf/blob/0.1.x/src/Type.php#L20) на паттерне «посетитель», что делает ее фактически бесконечно расширяемой.
+
+Так, чтобы узнать тип тега, основанном на типе поля, нам нужен простой `enum`:
+```php
+
+/**
+ * @template-implements Visitor<WireType>
+ */
+enum DetermineWireType implements Visitor
+{
+    case Visitor;
+
+    #[\Override]
+    public function bool(BoolT $type): WireType
+    {
+        return WireType::VARINT;
+    }
+
+    #[\Override]
+    public function float(FloatT $type): WireType
+    {
+        return WireType::FIXED32;
+    }
+
+    #[\Override]
+    public function double(DoubleT $type): WireType
+    {
+        return WireType::FIXED64;
+    }
+
+    ...
+}
+```
+
+Который в процессе сериализации вызывается для каждого поля:
+```php
+/**
+ * @api
+ */
+final readonly class Serializer
+{
+    public function serialize(Message $message): string
+    {
+        $buffer = new ByteBuffer();
+
+        foreach ($message->fields as $field) {
+            $type = $field->value->type;
+
+            $type
+                ->accept(
+                    new TypeSerializerVisitor(
+                        new Tag($field->num, $type->accept(DetermineWireType::Visitor)),
+                    ),
+                )
+                ->serialize($buffer, $field->value->value);
+        }
+
+        return $buffer->flush();
+    }
+}
+```
+
+С другой стороны, чтобы узнать, является ли список `packed`, можно написать следующее:
+```php
+/**
+ * @template-extends DefaultTypeVisitor<bool>
+ */
+final class IsPacked extends DefaultTypeVisitor
+{
+    #[\Override]
+    public function string(StringT $type): bool
+    {
+        return false;
+    }
+
+    #[\Override]
+    public function message(MessageT $type): mixed
+    {
+        return false;
+    }
+
+    #[\Override]
+    protected function default(Type $type): bool
+    {
+        return true;
+    }
+}
+```
+
+В общем, идею вы поняли: если нужно расширить логику — пишем визитор.
+
+Поскольку схемы, как правило, статические — вне зависимости от того, собираются они функциями или атрибутами, — у нас появляется возможность статически их верифицировать. Как я уже сказал, карты не могут быть `repeated` — и это ограничение можно выразить с помощью статического анализа:
+```php
+/**
+ * @template-covariant T
+ * @template Repeatable of 'repeatable' | 'not-repeatable' = 'repeatable'
+ */
+interface Type
+{
+    /**
+     * @template TResult
+     * @param Type\Visitor<TResult> $visitor
+     * @return TResult
+     */
+    public function accept(Type\Visitor $visitor): mixed;
+}
+```
+
+Здесь `Type` определяет некоторый дженерик, который указывает на возможность типу быть повторяемым. Тогда для списка мы укажем (хотя необязательно, потому что указан инвариант по умолчанию), что передавать можно только тип c инвариантом `repeatable`:
+```php
+/**
+ * @template T
+ * @template-implements Type<list<T>, ...>
+ */
+final readonly class ListT implements Type
+{
+    /**
+     * @param Type<T, 'repeatable', *, *> $element
+     */
+    public function __construct(
+        public Type $element,
+    ) {}
+}
+```
+
+А сам тип `MapT` определим как `not-repeatable`:
+```php
+/**
+ * @template K
+ * @template V
+ * @template-implements Type<Protobuf\Map<K, V>, 'not-repeatable', *, *>
+ */
+final readonly class MapT implements Type
+{
+    ...
+}
+```
+
+Теперь такой код написать будет просто нельзя:
+```php
+use Thesis\Protobuf;
+
+$type = Protobuf\listT(Protobuf\mapT(
+   Protobuf\stringT,
+   Protobuf\stringT,
+));
+```
+
+Так мы проверяем и все остальные ограничения вроде того, какие типы могут быть ключами карты, а какие — значениями.
+
+Как я уже сказал, пользоваться такой многословной моделью неудобно — нужна рефлексия. Впрочем, рефлексия тоже не лишена необходимости быть замоделированной через атрибуты, потому что иначе просто не будет понятно, в каком порядке (полагаться на порядок полей в конструкторе нельзя) и какого типа (`php` в этом отношении крайне невыразительный язык) поля идут, но это проблему решает следующий уровень — кодогенерация, о которой будет подробно написано в третьей статье.
+
+Выразим модель гитхаба с помощью атрибутов, необходимых рефлексии:
+```php
+final readonly class Organization
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $name,
+        #[Reflection\Field(2, Reflection\StringT::T)]
+        public string $role,
+    ) {}
+}
+
+final readonly class User
+{
+    public function __construct(
+        #[Reflection\Field(1, Reflection\StringT::T)]
+        public string $username,
+        #[Reflection\Field(2, new Reflection\ListT(
+            new Reflection\ObjectT(Organization::class),
+        ))]
+        public array $organizations = [],
+    ) {}
+}
+```
+
+Теперь схема `protobuf` неотделима от кода, как и должно быть и сделано в других библиотеках сериализации. 
+
 ---
 
 [^1]: полный алгоритм `varint` сериализации можно посмотреть по [ссылке](https://github.com/thesis-php/varint/blob/0.2.x/src/BcMath.php#L18-L31).
