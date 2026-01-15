@@ -4,5 +4,5 @@ up:
 down:
 	docker compose down --remove-orphans
 
-serve:
+serve: up
 	docker compose exec deno deno task serve
