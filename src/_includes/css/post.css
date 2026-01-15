@@ -307,3 +307,24 @@ pre[class*="language-"]:hover .copy-button {
         -webkit-overflow-scrolling: touch;
     }
 }
+
+.post-series-nav {
+  display: flex;
+  margin: 0.6em 0 1.6em;
+  font-size: 0.95em;
+}
+
+.post-series-nav a {
+  color: var(--color-dim);
+  text-decoration: none;
+  max-width: 48%;
+}
+
+.post-series-nav a:hover {
+  text-decoration: underline;
+}
+
+.post-series-nav .next {
+  margin-left: auto;
+  text-align: right;
+}

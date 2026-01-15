@@ -7,6 +7,22 @@ bodyClass: body-post
     <h1 class="post-title">{{ title }}</h1>
   </header>
 
+  {{ if prev || next }}
+    <nav class="post-series-nav">
+      {{ if prev }}
+        <a class="prev" href="/posts/{{ prev.url }}">
+          ← {{ prev.title }}
+        </a>
+      {{ /if }}
+
+      {{ if next }}
+        <a class="next" href="/posts/{{ next.url }}">
+          {{ next.title }} →
+        </a>
+      {{ /if }}
+    </nav>
+  {{ /if }}
+
   {{# {{ if toc.length }}
   <nav class="toc">
     <ol>
