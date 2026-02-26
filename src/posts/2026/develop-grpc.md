@@ -121,12 +121,12 @@ $response = $this->client->request($request, $cancellation);
 ```php
 use function Amp\async;
 
-$response = async($this->client->request(...), $request, $cancellation);
+$future = async($this->client->request(...), $request, $cancellation);
 ```
 
-Между прочим, еще совсем недавно даже этот код не [работал](https://github.com/amphp/http-client/pull/380). Именно по этой (в большей степени) причине мы начали сомневаться в выборе библиотеки. Неужели люди, писавшие реализацию `http/2`, а уж тем более файберы, не понимают, как пользоваться стримами или, если понимают, как дать им интерфейс? В общем, выбора у нас все равно не было: неблокирующие `http` клиенты на дороге не валяются, особенно с реализацией протокола `http/2`, по крайней мере в `php`. Найдется время — напишем свой.
+Между прочим, еще совсем недавно даже этот код не [работал](https://github.com/amphp/http-client/pull/380). Клиент ждал, пока весь запрос, включая тело, которым может быть итератор, не отправится серверу, и только потом возвращал ответ. Реализовать стримы с таким подходом было невозможно. Теперь же, несмотря на то, что у нас по-прежнему нет нормального апи для работы со стримами, мы хотя бы можем начинать читать тело ответа, пока отправляем тело запроса.   
 
-Итак, чтобы создать двунаправленный стрим, нужны две очереди: одна превращается в тело запроса, другая — тело ответа. Для этого можно использовать [amphp/pipeline](https://github.com/amphp/pipeline), который превращает обычные итераторы в конкурентные, а для превращения тела запроса из итератора в стрим, понятный клиенту, использовать [StreamedContent](https://github.com/amphp/http-client/blob/5.x/src/StreamedContent.php):
+Итак, чтобы создать двунаправленный стрим, нужны две очереди: одна превращается в тело запроса, другая — в тело ответа. Для этого можно использовать [amphp/pipeline](https://github.com/amphp/pipeline), который превращает обычные итераторы в конкурентные. А для превращения тела запроса из итератора в стрим, понятный клиенту, использовать [StreamedContent](https://github.com/amphp/http-client/blob/5.x/src/StreamedContent.php):
 ```php
 use Amp\Pipeline;
 
@@ -144,12 +144,12 @@ $request = new Request(
 
 Осталось отправить *асинхронно* запрос и вернуть пользователю [стрим](https://github.com/thesis-php/grpc/blob/0.1.x/src/Client/Internal/Http2/ConcurrentClientStream.php):
 ```php
-$response = async($this->client->request(...), $request, $cancellation);
+$future = async($this->client->request(...), $request, $cancellation);
 
 return new ConcurrentClientStream($send);
 ```
 
-Когда пользователь будет отправлять сообщения в стрим с помощью `ConcurrentClientStream::send()`, они из очереди попадут клиенту, который по мере возможности отправит их серверу. Правда, сейчас сообщения стрима никак не сериализуются и не сжимаются, поэтому из одной очереди мы можем сделать другую, пропуская элементы через [StreamCodec](https://github.com/thesis-php/grpc/blob/0.1.x/src/Internal/Http2/StreamCodec.php):
+Когда пользователь будет отправлять сообщения в очередь, используя `ConcurrentClientStream::send()`, они попадут клиенту, который по мере получения будет [отправлять](https://github.com/amphp/http-client/blob/5.x/src/Connection/Internal/Http2ConnectionProcessor.php#L1037-L1047) их серверу. Правда, сейчас сообщения стрима никак не сериализуются и не сжимаются, поэтому из одной очереди мы можем сделать другую, пропуская элементы через [StreamCodec](https://github.com/thesis-php/grpc/blob/0.1.x/src/Internal/Http2/StreamCodec.php):
 ```php
 $request = new Request(
     ...
@@ -157,6 +157,87 @@ $request = new Request(
       new ReadableIterableStream($this->codec->encode($send->iterate())),
     ),
 );
+```
+
+Правда, чтобы читать ответ *параллельно* отправке запроса, нужно дождаться завершения фьючи:
+```php
+$future = async($this->client->request(...), $request, $cancellation);
+```
+
+А она завершится, когда [придут](https://github.com/amphp/http-client/blob/5.x/src/Connection/Internal/Http2ConnectionProcessor.php#L444) первые заголовки от сервера. Тело ответа, в свою очередь, так же, как тело запроса, будет итератором, элементы которого понадобится разжать и декодировать. Поэтому в наш стрим мы можем передать фьючу и [функцию-замыкание](https://github.com/thesis-php/grpc/blob/0.1.x/src/Internal/Http2/StreamCodec.php#L69) для декодирования итератора:
+```php
+$future = async($this->http->request(...), $request, $cancellation);
+
+return new ConcurrentClientStream(
+    responseFuture: $future,
+    send: $send,
+    decode: fn(Response $response) => $this->codec->decode(
+        $response->getBody(),
+        $invoke->type,
+    ),
+);
+```
+
+В конечном счете мы получаем двунаправленный стрим на базе конкурентных итераторов, поддающихся по мере своего чтения неявному преобразованию из пользовательских объектов в `grpc` фреймы в случае запроса и наоборот — в случае ответа.
+
+```php
+/**
+ * @template In of object
+ * @template-covariant Out of object
+ * @template-implements \IteratorAggregate<array-key, Out>
+ */
+final class ConcurrentClientStream implements \IteratorAggregate
+{
+    private Response $response {
+        get => $this->response ??= $this->responseFuture->await();
+    }
+
+    /** @var Pipeline\ConcurrentIterator<Out> */
+    private Pipeline\ConcurrentIterator $recv {
+        get => $this->recv ??= ($this->decode)($this->response);
+    }
+
+    /**
+     * @param Future<Response> $responseFuture
+     * @param Pipeline\Queue<In> $send
+     * @param \Closure(Response): Pipeline\ConcurrentIterator<Out> $decode
+     */
+    public function __construct(
+        private readonly Future $responseFuture,
+        private readonly Pipeline\Queue $send,
+        private readonly \Closure $decode,
+    ) {}
+
+    /**
+     * @param In $message
+     */
+    public function send(object $message): void
+    {
+        try {
+            $this->send->push($message);
+        } catch (Pipeline\DisposedException $e) {
+            throw new ClientStreamIsClosed($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @return Out
+     */
+    public function receive(): object
+    {
+        if (!$this->recv->continue()) {
+            // throw exception
+        }
+
+        return $this->recv->getValue();
+    }
+
+    #[\Override]
+    public function getIterator(): \Traversable
+    {
+        return $this->recv;
+    }
+}
 ```
 
 ---
