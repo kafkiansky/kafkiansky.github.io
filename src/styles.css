@@ -9,13 +9,117 @@
   --color-link: var(--color-base);
   --color-link-hover: var(--color-dim);
   --font-body: "content";
+  --theme-bg: #FFFFFF;
+  --theme-text: #111;
+  --theme-muted: #888;
+  --post-link: #3366cc;
+  --post-link-hover: #000;
+  --list-link-color: #000;
+  --list-link-underline: #aaa;
+  --code-block-bg: #F3F5F7;
+  --code-block-text: #000;
+  --code-inline-bg: #d0f9df;
+  --code-comment: #6a737d;
+  --code-keyword: #d73a49;
+  --code-function: #6f42c1;
+  --code-class: #005cc5;
+  --code-variable: #24292e;
+  --code-string: #032f62;
+  --copy-btn-bg: #E7EBEF;
+  --copy-btn-border: rgba(0, 0, 0, 0.12);
+  --copy-btn-color: #737373;
+  --copy-btn-hover-bg: #F0F3F6;
+  --copy-btn-hover-border: rgba(0, 0, 0, 0.22);
+  --copy-btn-hover-color: #111;
+  --copy-btn-done-bg: #e7f7ee;
+  --copy-btn-done-border: #9dd6b4;
+  --copy-btn-done-color: #18794e;
+  --table-line: #111;
+  --tutorial-badge-bg: #efe7ff;
+  --tutorial-badge-border: #b99cff;
+  --tutorial-badge-text: #6d3de8;
+  --tutorial-badge-hover-bg: #e5d8ff;
+  --tutorial-badge-hover-border: #9e7cf6;
+  --tutorial-badge-hover-text: #5d30cf;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --theme-bg: #171B21;
+    --theme-text: #e6e8eb;
+    --theme-muted: #9aa3ad;
+    --post-link: #84a9ff;
+    --post-link-hover: #d9e2ff;
+    --list-link-color: #eef1f5;
+    --list-link-underline: #6f7a86;
+    --code-block-bg: #1F2630;
+    --code-block-text: #e6edf3;
+    --code-inline-bg: #203145;
+    --code-comment: #8fa1b3;
+    --code-keyword: #ff7b8b;
+    --code-function: #c6a8ff;
+    --code-class: #8ec1ff;
+    --code-variable: #e6edf3;
+    --code-string: #9ad0ff;
+    --copy-btn-bg: #273242;
+    --copy-btn-border: rgba(255, 255, 255, 0.14);
+    --copy-btn-color: #b3beca;
+    --copy-btn-hover-bg: #2E3A4C;
+    --copy-btn-hover-border: rgba(255, 255, 255, 0.24);
+    --copy-btn-hover-color: #f1f5f9;
+    --copy-btn-done-bg: #153327;
+    --copy-btn-done-border: #2d7a54;
+    --copy-btn-done-color: #7ee2aa;
+    --table-line: #cfd7df;
+    --tutorial-badge-bg: #2b2140;
+    --tutorial-badge-border: #7654b8;
+    --tutorial-badge-text: #d2befa;
+    --tutorial-badge-hover-bg: #342750;
+    --tutorial-badge-hover-border: #8c6ad1;
+    --tutorial-badge-hover-text: #e3d6ff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --theme-bg: #171B21;
+  --theme-text: #e6e8eb;
+  --theme-muted: #9aa3ad;
+  --post-link: #84a9ff;
+  --post-link-hover: #d9e2ff;
+  --list-link-color: #eef1f5;
+  --list-link-underline: #6f7a86;
+  --code-block-bg: #1F2630;
+  --code-block-text: #e6edf3;
+  --code-inline-bg: #203145;
+  --code-comment: #8fa1b3;
+  --code-keyword: #ff7b8b;
+  --code-function: #c6a8ff;
+  --code-class: #8ec1ff;
+  --code-variable: #e6edf3;
+  --code-string: #9ad0ff;
+  --copy-btn-bg: #273242;
+  --copy-btn-border: rgba(255, 255, 255, 0.14);
+  --copy-btn-color: #b3beca;
+  --copy-btn-hover-bg: #2E3A4C;
+  --copy-btn-hover-border: rgba(255, 255, 255, 0.24);
+  --copy-btn-hover-color: #f1f5f9;
+  --copy-btn-done-bg: #153327;
+  --copy-btn-done-border: #2d7a54;
+  --copy-btn-done-color: #7ee2aa;
+  --table-line: #cfd7df;
+  --tutorial-badge-bg: #2b2140;
+  --tutorial-badge-border: #7654b8;
+  --tutorial-badge-text: #d2befa;
+  --tutorial-badge-hover-bg: #342750;
+  --tutorial-badge-hover-border: #8c6ad1;
+  --tutorial-badge-hover-text: #e3d6ff;
 }
 
 /* google-fonts */
 
 html,
 body {
-  background-color: #ffff !important;
+  background-color: var(--theme-bg) !important;
   font-weight: 400;
   font-family: "content";
   font-size: 19px;
@@ -28,11 +132,15 @@ html {
 }
 
 body {
-  color: #111;
+  color: var(--theme-text);
   font-weight: 450;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
+  flex: 1;
   padding: var(--row-gap-medium) 0;
   max-width: min(100% - 15vw, 45em);
   margin: 0 auto;
@@ -93,4 +201,38 @@ main {
 
 .body-post .post-title {
   font-family: "content";
+}
+
+.site-footer {
+  margin: 2.1rem 0 2.8rem;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 min(5vw, 5rem);
+}
+
+.footer-rss {
+  width: 24px;
+  height: 24px;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.footer-rss:hover {
+  opacity: 1;
+}
+
+.footer-rss img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .footer-rss img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+:root[data-theme="dark"] .footer-rss img {
+  filter: brightness(0) invert(1);
 }

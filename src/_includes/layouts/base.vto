@@ -17,6 +17,14 @@
     <meta name="twitter:title" content="{{ it.title || metas.site }}">
     <meta name="twitter:description" content="{{ it.description || metas.description }}">
     <meta name="twitter:image" content="{{ (it.image || metas.image || '/favicon.png') |> url(true) }}">
+    <script>
+      (() => {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      })();
+    </script>
     
     <link rel="stylesheet" href="/styles.css">
     <link rel="alternate" href="/feed.xml" type="application/atom+xml" title="{{ metas.site }}">
@@ -48,11 +56,48 @@
           </a>
         </li>
       {{ /for }}
+        <li>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+            <span class="theme-toggle-icon" aria-hidden="true"></span>
+          </button>
+        </li>
+        <li class="burger">
+          <button id="burger-toggle" class="burger-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="burger-menu">
+            <span class="burger-lines" aria-hidden="true"></span>
+          </button>
+          <div id="burger-menu" class="burger-menu" role="menu" aria-hidden="true">
+            <ul class="burger-menu-links">
+              {{ for link of (it.burger_links || []) }}
+                <li>
+                  <a href="{{ link.href }}" {{ if link.href == url }} aria-current="page"{{ /if }} {{ if link.target }} target="{{ link.target }}"{{ /if }} role="menuitem">
+                    {{ link.text }}
+                  </a>
+                </li>
+              {{ /for }}
+            </ul>
+            {{ if (it.burger_footer_links || []).length }}
+              <ul class="burger-menu-footer">
+                {{ for link of (it.burger_footer_links || []) }}
+                  <li>
+                    <a href="{{ link.href }}" {{ if link.target }} target="{{ link.target }}"{{ /if }} role="menuitem">
+                      {{ link.text }}
+                    </a>
+                  </li>
+                {{ /for }}
+              </ul>
+            {{ /if }}
+          </div>
+        </li>
       </ul>
     </nav>
 
     <main class="{{ it.bodyClass }}">
       {{ content }}
     </main>
+    <footer class="site-footer">
+      <a class="footer-rss" href="/feed.xml" target="_blank" rel="noopener noreferrer" aria-label="RSS">
+        <img src="{{ 'rss' |> icon('feather') }}" alt="rss">
+      </a>
+    </footer>
   </body>
 </html>

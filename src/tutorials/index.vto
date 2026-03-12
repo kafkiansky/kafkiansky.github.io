@@ -1,0 +1,40 @@
+---
+layout: layouts/base.vto
+bodyClass: body-home
+title: Серии
+---
+
+<section class="postList">
+  <div class="year-block">
+    <h2 class="year-title">Серии</h2>
+    <div class="year-posts">
+      {{ for tutorial of search.pages("type=tutorial", "title=asc") }}
+        <article class="post">
+          <header class="post-header">
+            <h2 class="post-title">
+              <a href="{{ tutorial.url }}" {{ if tutorial.url == url }} aria-current="page"{{ /if }}>
+                {{ tutorial.tutorial_title || tutorial.title || tutorial.url }}
+              </a>
+              <span class="post-date">
+                {{
+                  (() => {
+                    const n = (tutorial.tutorial_posts || []).length;
+                    const mod10 = n % 10;
+                    const mod100 = n % 100;
+                    const word = mod10 === 1 && mod100 !== 11
+                      ? "статья"
+                      : (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14))
+                      ? "статьи"
+                      : "статей";
+
+                    return `${n} ${word}`;
+                  })()
+                }}
+              </span>
+            </h2>
+          </header>
+        </article>
+      {{ /for }}
+    </div>
+  </div>
+</section>

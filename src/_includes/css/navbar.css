@@ -33,3 +33,178 @@
 .navbar-home {
   text-decoration: none;
 }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--copy-btn-color);
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.18s ease, color 0.18s ease;
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+  color: var(--copy-btn-hover-color);
+}
+
+.theme-toggle-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-toggle[data-theme-state="dark"] {
+  opacity: 1;
+  color: var(--copy-btn-hover-color);
+}
+
+.burger {
+  position: relative;
+}
+
+.burger-toggle {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--copy-btn-color);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.18s ease, color 0.18s ease;
+}
+
+.burger-toggle:hover,
+.burger.open .burger-toggle {
+  opacity: 1;
+  color: var(--copy-btn-hover-color);
+}
+
+.burger-lines {
+  position: relative;
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  display: inline-block;
+  transition: background-color 0.18s ease;
+}
+
+.burger-lines::before,
+.burger-lines::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.22s ease, top 0.22s ease, opacity 0.22s ease;
+}
+
+.burger-lines::before {
+  top: -5px;
+}
+
+.burger-lines::after {
+  top: 5px;
+}
+
+.burger.open .burger-lines {
+  background: transparent;
+}
+
+.burger.open .burger-lines::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.burger.open .burger-lines::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+.burger-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.55rem);
+  width: 220px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--copy-btn-border);
+  border-radius: 10px;
+  background: var(--theme-bg);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  display: none;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 20;
+}
+
+.burger.open .burger-menu {
+  display: flex;
+}
+
+.burger-menu-links,
+.burger-menu-footer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.burger-menu-footer {
+  margin-top: 0.35rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--copy-btn-border);
+}
+
+.burger-menu a {
+  position: relative;
+  display: block;
+  color: var(--theme-text);
+  text-decoration: none;
+  font: var(--font-ui);
+  padding: 0.38rem 0.35rem 0.38rem 1.4rem;
+  border-radius: 6px;
+}
+
+.burger-menu a:hover {
+  background: color-mix(in oklab, var(--theme-text) 6%, transparent);
+}
+
+.burger-menu a[aria-current="page"]::before {
+  content: "\003E";
+  position: absolute;
+  left: 0.48rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.9;
+}
+
+@media (max-width: 680px) {
+  .burger-menu {
+    width: min(240px, calc(100vw - 2rem));
+    right: -0.4rem;
+  }
+}

@@ -57,7 +57,7 @@
     margin-bottom: 1.2em;
     font-family: "content";
     font-size: 19px;
-    color: #000;
+    color: var(--theme-text);
     font-weight: 400;
     line-height: 1.5;
 }
@@ -67,31 +67,31 @@
 .post li {
     font-family: "content";
     font-size: 19px;
-    color: #000;
+    color: var(--theme-text);
     font-weight: 400;
     line-height: 1.5;
 }
 
 .post li::marker {
-    color: #000;
+    color: var(--theme-text);
 }
 
 .post a,
 .post-content a,
 .content a {
-    color: #3366cc;
+    color: var(--post-link);
     text-decoration: underline;
 }
 
 .post a:hover,
 .post-content a:hover,
 .content a:hover {
-    color: #000;
+    color: var(--post-link-hover);
 }
 
 pre[class*="language-"],
 code[class*="language-"] {
-    background-color: #ffff;
+    background-color: var(--code-block-bg);
     font-family: "code", monospace !important;
     border: none;
     box-shadow: none;
@@ -124,7 +124,7 @@ pre[class*="language-"] *,
 }
 
 code {
-    background-color: #d0f9df;
+    background-color: var(--code-inline-bg);
     padding: 0.1em 0.4em;
     border-radius: 4px;
 }
@@ -132,7 +132,7 @@ code {
 .post :not(pre)>code,
 .post-content :not(pre)>code {
     background: transparent !important;
-    color: #000 !important;
+    color: var(--theme-text) !important;
     padding: 0 !important;
     border-radius: 0 !important;
     font-size: 0.95em;
@@ -140,15 +140,15 @@ code {
 
 pre[class*="language-"],
 pre[class*="language-"] code {
-    background: #fff;
-    color: #000;
+    background: var(--code-block-bg);
+    color: var(--code-block-text);
 }
 
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-    color: #6a737d;
+    color: var(--code-comment);
     font-style: italic;
 }
 
@@ -156,50 +156,50 @@ pre[class*="language-"] code {
 .token.control,
 .token.operator,
 .token.directive {
-    color: #d73a49;
+    color: var(--code-keyword);
     font-weight: 600;
 }
 
 .token.function,
 .token.method {
-    color: #6f42c1 !important;
+    color: var(--code-function) !important;
     font-weight: 500;
 }
 
 .token.function-definition {
-    color: #6f42c1 !important;
+    color: var(--code-function) !important;
     font-weight: 600;
 }
 
 .token.class-name {
-    color: #005cc5;
+    color: var(--code-class);
     font-weight: 600;
 }
 
 .token.builtin {
-    color: #005cc5;
+    color: var(--code-class);
     font-weight: 500;
 }
 
 .token.variable,
 .token.parameter,
 .token.property {
-    color: #24292e;
+    color: var(--code-variable);
 }
 
 .token.string,
 .token.char,
 .token.number {
-    color: #032f62;
+    color: var(--code-string);
 }
 
 .token.attr-value {
-    color: #032f62;
+    color: var(--code-string);
 }
 
 pre[class*="language-"] .token.comment {
     background-color: transparent;
-    color: #6a737d;
+    color: var(--code-comment);
     font-weight: 400;
     line-height: 1.4;
 }
@@ -217,10 +217,10 @@ pre[class*="language-"] .token.comment {
     justify-content: center;
     width: 30px;
     height: 30px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--copy-btn-border);
     border-radius: 6px;
-    background: #f8f8f8;
-    color: #737373;
+    background: var(--copy-btn-bg);
+    color: var(--copy-btn-color);
     cursor: pointer;
     opacity: 0;
     transform: translateY(-2px);
@@ -233,9 +233,9 @@ pre[class*="language-"] .token.comment {
 }
 
 .copy-button:hover {
-    color: #111;
-    background: #fff;
-    border-color: rgba(0, 0, 0, 0.22);
+    color: var(--copy-btn-hover-color);
+    background: var(--copy-btn-hover-bg);
+    border-color: var(--copy-btn-hover-border);
 }
 
 .copy-button svg {
@@ -248,9 +248,9 @@ pre[class*="language-"] .token.comment {
 }
 
 .copy-button.copied {
-    background: #e7f7ee;
-    border-color: #9dd6b4;
-    color: #18794e;
+    background: var(--copy-btn-done-bg);
+    border-color: var(--copy-btn-done-border);
+    color: var(--copy-btn-done-color);
 }
 
 .copy-button.copied .copy-icon {
@@ -273,17 +273,17 @@ pre[class*="language-"] .token.comment {
     background-image:
         repeating-linear-gradient(
             to bottom,
-            #111 0 18px,
+            var(--table-line) 0 18px,
             transparent 18px 24px
         ),
         repeating-linear-gradient(
             to bottom,
-            #111 0 18px,
+            var(--table-line) 0 18px,
             transparent 18px 24px
         ),
         repeating-linear-gradient(
             to right,
-            #111 0 18px,
+            var(--table-line) 0 18px,
             transparent 18px 24px
         );
     background-position:
@@ -314,7 +314,7 @@ pre[class*="language-"] .token.comment {
     border-left: none;
     background-image: repeating-linear-gradient(
         to bottom,
-        #111 0 18px,
+        var(--table-line) 0 18px,
         transparent 18px 24px
     );
     background-position: left top;
@@ -323,13 +323,13 @@ pre[class*="language-"] .token.comment {
 }
 
 .post-body thead th {
-    border-top: 2px solid #111;
-    border-bottom: 2px solid #111;
+    border-top: 2px solid var(--table-line);
+    border-bottom: 2px solid var(--table-line);
     background-image: none;
 }
 
 .post-body thead th + th {
-    border-left: 2px solid #111;
+    border-left: 2px solid var(--table-line);
     background-image: none;
 }
 

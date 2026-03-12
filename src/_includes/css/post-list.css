@@ -27,8 +27,8 @@
         & a {
             text-decoration: underline;
             text-decoration-thickness: 1px;
-            text-decoration-color: #aaa;
-            color: #000000;
+            text-decoration-color: var(--list-link-underline);
+            color: var(--list-link-color);
             font-size: 0.55em;
             font-weight: normal;
         }
@@ -36,8 +36,8 @@
         & a:hover {
             text-decoration: underline;
             text-decoration-thickness: 1px;
-            color: #000000;
-            text-decoration-color: #000000;
+            color: var(--list-link-color);
+            text-decoration-color: var(--list-link-color);
         }
     }
 }
@@ -45,17 +45,17 @@
 .post-date {
     font-size: 0.5em;
     font-weight: 400;
-    color: #888;
+    color: var(--theme-muted);
 }
 
 .post .tutorial-badge,
 .post .tutorial-badge:visited {
     display: inline-block;
     padding: 0.08em 0.55em;
-    border: 1px solid #b99cff;
+    border: 1px solid var(--tutorial-badge-border);
     border-radius: 3px;
-    background: #efe7ff;
-    color: #6d3de8 !important;
+    background: var(--tutorial-badge-bg);
+    color: var(--tutorial-badge-text) !important;
     text-decoration: none !important;
     font-size: 0.68rem;
     font-weight: 450;
@@ -63,9 +63,9 @@
 }
 
 .post .tutorial-badge:hover {
-    border-color: #9e7cf6;
-    color: #5d30cf !important;
-    background: #e5d8ff;
+    border-color: var(--tutorial-badge-hover-border);
+    color: var(--tutorial-badge-hover-text) !important;
+    background: var(--tutorial-badge-hover-bg);
     text-decoration: none !important;
 }
 

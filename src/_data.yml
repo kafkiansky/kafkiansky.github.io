@@ -1,12 +1,12 @@
 lang: ru
 
-menu_links:
-  - text: rss
-    href: /feed.xml
-    target: _blank
-    img:
-      icon: rss
-      source: feather
+menu_links: []
+
+burger_links:
+  - text: Серии
+    href: /tutorials/
+
+burger_footer_links: []
 extra_head: []
 
 metas:

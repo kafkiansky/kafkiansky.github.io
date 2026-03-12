@@ -1,5 +1,6 @@
 ---
 layout: layouts/tutorial.vto
+type: tutorial
 title: Разработка protobuf, gRPC и protoc плагина
 tutorial_title: Разработка protobuf, gRPC и protoc плагина
 tutorial_posts:
