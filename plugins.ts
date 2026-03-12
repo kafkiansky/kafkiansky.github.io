@@ -21,6 +21,7 @@ import "npm:prismjs@1.29.0/components/prism-clike.js";
 import "npm:prismjs@1.29.0/components/prism-markup-templating.js";
 import "npm:prismjs@1.29.0/components/prism-php.js";
 import "npm:prismjs@1.29.0/components/prism-go.js";
+import "npm:prismjs@1.29.0/components/prism-protobuf.js";
 
 import "lume/types.ts";
 
@@ -33,7 +34,7 @@ export interface Options {
 
 export const defaults: Options = {
     prism: {
-        languages: ["php", "go"],
+        languages: ["php", "go", "protobuf"],
         css: "prism.css",
         js: "prism.js",
     },
@@ -96,6 +97,13 @@ export default function (userOptions?: Options) {
             .mergeKey("extra_head", "stringArray")
             .preprocess([".md"], (pages) => {
                 for (const page of pages) {
+                    if (typeof page.data.content === "string") {
+                        page.data.content = page.data.content.replace(
+                            /^```proto(\s*)$/gm,
+                            "```protobuf$1",
+                        );
+                    }
+
                     page.data.excerpt ??= (page.data.content as string).split(
                         /<!--\s*more\s*-->/i,
                     )[0];
