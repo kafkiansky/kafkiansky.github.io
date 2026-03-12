@@ -75,6 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!code) return;
     if (pre.parentElement?.classList.contains("code-block")) return;
 
+    const raw = code.textContent ?? "";
+    const normalized = raw.endsWith("\n") ? raw.slice(0, -1) : raw;
+    const lineCount = Math.max(1, normalized.split("\n").length);
+    const lineNumbers = document.createElement("span");
+    lineNumbers.className = "code-line-numbers";
+    lineNumbers.setAttribute("aria-hidden", "true");
+    lineNumbers.textContent = Array.from({ length: lineCount }, (_, index) =>
+      String(index + 1)
+    ).join("\n");
+
     const button = document.createElement("button");
     button.className = "copy-button";
     button.type = "button";
@@ -106,6 +116,87 @@ document.addEventListener("DOMContentLoaded", () => {
     wrapper.className = "code-block";
     pre.parentNode?.insertBefore(wrapper, pre);
     wrapper.appendChild(pre);
+    wrapper.appendChild(lineNumbers);
     wrapper.appendChild(button);
   });
+
+  const lightbox = document.createElement("div");
+  lightbox.className = "image-lightbox";
+  lightbox.setAttribute("aria-hidden", "true");
+  lightbox.innerHTML = `
+    <div class="image-lightbox-backdrop"></div>
+    <figure class="image-lightbox-figure" role="dialog" aria-modal="true" aria-label="Image preview">
+      <button class="image-lightbox-close" type="button" aria-label="Close image">×</button>
+      <img class="image-lightbox-image" alt="">
+    </figure>
+  `;
+  document.body.appendChild(lightbox);
+
+  const lightboxImage = lightbox.querySelector(".image-lightbox-image");
+  const closeButton = lightbox.querySelector(".image-lightbox-close");
+  const backdrop = lightbox.querySelector(".image-lightbox-backdrop");
+  const figure = lightbox.querySelector(".image-lightbox-figure");
+  let zoomScale = 1;
+
+  const applyZoom = () => {
+    if (!lightboxImage) return;
+    lightboxImage.style.transform = `scale(${zoomScale})`;
+  };
+
+  const closeLightbox = () => {
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("lightbox-open");
+    zoomScale = 1;
+    applyZoom();
+    if (lightboxImage) {
+      lightboxImage.removeAttribute("src");
+      lightboxImage.removeAttribute("srcset");
+      lightboxImage.removeAttribute("sizes");
+      lightboxImage.alt = "";
+    }
+  };
+
+  document.querySelectorAll(".post-body img, .post-content img").forEach((img) => {
+    img.classList.add("zoomable-image");
+    img.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!lightboxImage) return;
+
+      lightboxImage.src = img.currentSrc || img.src;
+      lightboxImage.srcset = img.srcset || "";
+      lightboxImage.sizes = img.sizes || "";
+      lightboxImage.alt = img.alt || "";
+      zoomScale = 1;
+      applyZoom();
+
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-open");
+    });
+  });
+
+  closeButton?.addEventListener("click", closeLightbox);
+  backdrop?.addEventListener("click", closeLightbox);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && lightbox.classList.contains("open")) {
+      closeLightbox();
+    }
+  });
+
+  figure?.addEventListener(
+    "wheel",
+    (event) => {
+      if (!lightbox.classList.contains("open")) return;
+      event.preventDefault();
+
+      const delta = event.deltaY;
+      const nextScale = delta < 0 ? zoomScale + 0.12 : zoomScale - 0.12;
+      zoomScale = Math.min(4, Math.max(1, Number(nextScale.toFixed(2))));
+      applyZoom();
+    },
+    { passive: false },
+  );
 });

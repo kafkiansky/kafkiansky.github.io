@@ -16,7 +16,7 @@
   --post-link-hover: #000;
   --list-link-color: #000;
   --list-link-underline: #aaa;
-  --code-block-bg: #F3F5F7;
+  --code-block-bg: #F7F9FB;
   --code-block-text: #000;
   --code-inline-bg: #d0f9df;
   --code-comment: #6a737d;
@@ -25,10 +25,10 @@
   --code-class: #005cc5;
   --code-variable: #24292e;
   --code-string: #032f62;
-  --copy-btn-bg: #E7EBEF;
+  --copy-btn-bg: #EDF2F6;
   --copy-btn-border: rgba(0, 0, 0, 0.12);
   --copy-btn-color: #737373;
-  --copy-btn-hover-bg: #F0F3F6;
+  --copy-btn-hover-bg: #F5F8FB;
   --copy-btn-hover-border: rgba(0, 0, 0, 0.22);
   --copy-btn-hover-color: #111;
   --copy-btn-done-bg: #e7f7ee;
@@ -124,6 +124,7 @@ body {
   font-family: "content";
   font-size: 19px;
   line-height: 1.65;
+  letter-spacing: 0.008em;
 }
 
 html {
@@ -133,7 +134,7 @@ html {
 
 body {
   color: var(--theme-text);
-  font-weight: 450;
+  font-weight: 400;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

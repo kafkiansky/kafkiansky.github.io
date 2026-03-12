@@ -91,6 +91,7 @@ export default function (userOptions?: Options) {
             }))
             .add("fonts")
             .add([".css"])
+            .add([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"])
             .add("js")
             .add("favicon.png")
             .add("uploads")
