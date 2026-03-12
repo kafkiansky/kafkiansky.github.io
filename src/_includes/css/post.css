@@ -243,69 +243,74 @@ pre[class*="language-"]:hover .copy-button {
 
 .post-body table {
     width: 100%;
+    margin-bottom: 25px;
+    font-family: "code", monospace;
     border-collapse: collapse;
-    margin: 1.8em 0;
     font-size: 0.95em;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    background-image:
+        repeating-linear-gradient(
+            to bottom,
+            #111 0 18px,
+            transparent 18px 24px
+        ),
+        repeating-linear-gradient(
+            to bottom,
+            #111 0 18px,
+            transparent 18px 24px
+        ),
+        repeating-linear-gradient(
+            to right,
+            #111 0 18px,
+            transparent 18px 24px
+        );
+    background-position:
+        left top,
+        right top,
+        left bottom;
+    background-repeat:
+        repeat-y,
+        repeat-y,
+        repeat-x;
+    background-size:
+        2px 24px,
+        2px 24px,
+        24px 2px;
+}
+
+.post-body thead {
+    background-color: transparent;
+}
+
+.post-body th,
+.post-body td {
+    padding: 0.25em 0.55em;
+    vertical-align: top;
+}
+
+.post-body tbody td + td {
+    border-left: none;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        #111 0 18px,
+        transparent 18px 24px
+    );
+    background-position: left top;
+    background-repeat: repeat-y;
+    background-size: 2px 24px;
 }
 
 .post-body thead th {
-    text-align: left;
-    font-weight: 600;
-    padding: 0.6em 0.8em;
-
-    border-bottom: 2px solid rgba(0, 0, 0, 0.15);
-    background-color: rgba(0, 0, 0, 0.03);
+    border-top: 2px solid #111;
+    border-bottom: 2px solid #111;
+    background-image: none;
 }
 
-.post-body tbody td {
-    padding: 0.6em 0.8em;
-    vertical-align: top;
-
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.post-body tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.post-body th+th,
-.post-body td+td {
-    border-left: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.post-body table {
-    line-height: 1.5;
-}
-
-.post-body th {
-    text-transform: none;
-    letter-spacing: 0.02em;
-}
-
-.post-body table code {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.15em 0.35em;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-.post-body tbody tr:hover {
-    background-color: rgba(220, 230, 240, 0.35);
-}
-
-.post-body table {
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-@media (max-width: 768px) {
-    .post-body table {
-        display: block;
-        max-width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+.post-body thead th + th {
+    border-left: 2px solid #111;
+    background-image: none;
 }
 
 .post-series-nav {
