@@ -1,0 +1,28 @@
+---
+layout: layouts/base.vto
+bodyClass: body-home
+---
+<section class="postList">
+  <header class="tutorial-header">
+    <h1 class="tutorial-title">{{ it.tutorial_title || it.title }}</h1>
+  </header>
+
+  <div class="year-block">
+    <div class="year-posts">
+      {{ for post of search.pages("type=post", "date=desc").filter((p) => (it.tutorial_posts || []).includes(p.url)) }}
+        <article class="post">
+          <header class="post-header">
+            <h2 class="post-title">
+              <a href="{{ post.url }}" {{ if post.url == url }} aria-current="page"{{ /if }}>
+                {{ post.title || post.url }}
+              </a>
+              <span class="post-date">
+                {{ new Date(post.date).toLocaleDateString('ru-RU', { month: '2-digit', day: '2-digit' }).replace(/\./g, '/') }}
+              </span>
+            </h2>
+          </header>
+        </article>
+      {{ /for }}
+    </div>
+  </div>
+</section>

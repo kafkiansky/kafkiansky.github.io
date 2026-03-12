@@ -97,13 +97,6 @@ export default function (userOptions?: Options) {
             .mergeKey("extra_head", "stringArray")
             .preprocess([".md"], (pages) => {
                 for (const page of pages) {
-                    if (typeof page.data.content === "string") {
-                        page.data.content = page.data.content.replace(
-                            /^```proto(\s*)$/gm,
-                            "```protobuf$1",
-                        );
-                    }
-
                     page.data.excerpt ??= (page.data.content as string).split(
                         /<!--\s*more\s*-->/i,
                     )[0];

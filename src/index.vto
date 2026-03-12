@@ -25,6 +25,11 @@ title: kafkiansky
                   {{ new Date(post.date).toLocaleDateString('ru-RU', { month: '2-digit', day: '2-digit' }).replace(/\./g, '/') }}
                 </span>
               </h2>
+              {{ if post.tutorial }}
+                <div class="post-tutorial">
+                  <a class="tutorial-badge" href="{{ post.tutorial.href }}">{{ post.tutorial.title }}</a>
+                </div>
+              {{ /if }}
             </header>
           </article>
         {{ /for }}
