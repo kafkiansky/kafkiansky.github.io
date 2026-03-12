@@ -233,10 +233,10 @@ pre[class*="language-"]>code {
     text-indent: 0 !important;
 }
 
-pre[class*="language-"] *,
+pre[class*="language-"] code *,
 .line-numbers .line-numbers-rows,
 .line-highlight {
-    background: none !important;
+    background: transparent;
     border: none !important;
 }
 
@@ -321,11 +321,68 @@ pre[class*="language-"] .token.comment {
     line-height: 1.4;
 }
 
+pre[class*="language-diff"] .token.deleted-sign,
+pre[class*="language-diff-"] .token.deleted-sign {
+    display: block;
+    margin: 0 -1em;
+    padding: 0.04em 1em;
+    background: rgba(220, 38, 38, 0.12) !important;
+    border-left: 3px solid #d14343;
+    color: inherit !important;
+}
+
+pre[class*="language-diff"] .token.inserted-sign,
+pre[class*="language-diff-"] .token.inserted-sign {
+    display: block;
+    margin: 0 -1em;
+    padding: 0.04em 1em;
+    background: rgba(22, 163, 74, 0.13) !important;
+    border-left: 3px solid #2f9e56;
+    color: inherit !important;
+}
+
+pre[class*="language-diff"] .token.prefix,
+pre[class*="language-diff-"] .token.prefix {
+    display: none !important;
+}
+
+:root[data-theme="dark"] pre[class*="language-diff"] .token.deleted-sign,
+:root[data-theme="dark"] pre[class*="language-diff-"] .token.deleted-sign {
+    background: rgba(248, 113, 113, 0.2) !important;
+    border-left-color: #f08a8a;
+    color: inherit !important;
+}
+
+:root[data-theme="dark"] pre[class*="language-diff"] .token.inserted-sign,
+:root[data-theme="dark"] pre[class*="language-diff-"] .token.inserted-sign {
+    background: rgba(74, 222, 128, 0.2) !important;
+    border-left-color: #7adf9b;
+    color: inherit !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) pre[class*="language-diff"] .token.deleted-sign,
+    :root:not([data-theme="light"]) pre[class*="language-diff-"] .token.deleted-sign {
+        background: rgba(248, 113, 113, 0.2) !important;
+        border-left-color: #f08a8a;
+        color: inherit !important;
+    }
+
+    :root:not([data-theme="light"]) pre[class*="language-diff"] .token.inserted-sign,
+    :root:not([data-theme="light"]) pre[class*="language-diff-"] .token.inserted-sign {
+        background: rgba(74, 222, 128, 0.2) !important;
+        border-left-color: #7adf9b;
+        color: inherit !important;
+    }
+}
+
 .code-block {
     position: relative;
     width: calc(100% + 4rem);
     margin-left: -2rem;
     margin-right: -2rem;
+    overflow: hidden;
+    border-radius: 6px;
 }
 
 .code-line-numbers {
@@ -338,12 +395,13 @@ pre[class*="language-"] .token.comment {
     border-right: 1px solid var(--copy-btn-border);
     color: var(--theme-muted);
     font-family: "code", monospace;
-    font-size: 0.88em;
+    font-size: 1em;
     line-height: 1.45;
     text-align: right;
     white-space: pre;
     user-select: none;
     pointer-events: none;
+    overflow: hidden;
 }
 
 @media (max-width: 900px) {

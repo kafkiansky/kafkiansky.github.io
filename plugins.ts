@@ -22,6 +22,8 @@ import "npm:prismjs@1.29.0/components/prism-markup-templating.js";
 import "npm:prismjs@1.29.0/components/prism-php.js";
 import "npm:prismjs@1.29.0/components/prism-go.js";
 import "npm:prismjs@1.29.0/components/prism-protobuf.js";
+import "npm:prismjs@1.29.0/components/prism-diff.js";
+import "npm:prismjs@1.29.0/plugins/diff-highlight/prism-diff-highlight.js";
 
 import "lume/types.ts";
 
@@ -34,7 +36,7 @@ export interface Options {
 
 export const defaults: Options = {
     prism: {
-        languages: ["php", "go", "protobuf"],
+        languages: ["php", "go", "protobuf", "diff"],
         css: "prism.css",
         js: "prism.js",
     },
