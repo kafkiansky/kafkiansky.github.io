@@ -3,3 +3,5 @@ layout: layouts/post.vto
 
 metas:
   title: "=title"
+  description: "=description"
+  image: "=image"

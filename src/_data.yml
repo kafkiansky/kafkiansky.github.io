@@ -12,5 +12,5 @@ extra_head: []
 metas:
   site: Бесконечный тупик
   description: Статьи о разработке, архитектуре и протоколах.
-  image: "=image"
+  image: /favicon.png
   lang: ru

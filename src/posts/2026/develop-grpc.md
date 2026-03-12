@@ -1,5 +1,6 @@
 ---
 title: Изобретая gRPC
+description: Хотя gRPC тесно ассоциирован с protobuf как часть одного фреймворка, эта связь не настолько сильная, чтобы на месте protobuf нельзя было использовать msgpack, упомянутый в прошлой статье avro или даже json.
 author: kafkiansky
 date: 2026-02-28
 tags:
