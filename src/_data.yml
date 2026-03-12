@@ -1,4 +1,4 @@
-lang: en
+lang: ru
 
 menu_links:
   - text: rss
@@ -11,5 +11,6 @@ extra_head: []
 
 metas:
   site: Бесконечный тупик
+  description: Статьи о разработке, архитектуре и протоколах.
   image: "=image"
-  lang: en
+  lang: ru
