@@ -204,41 +204,61 @@ pre[class*="language-"] .token.comment {
     line-height: 1.4;
 }
 
-pre[class*="language-"] {
+.code-block {
     position: relative;
 }
 
 .copy-button {
     position: absolute;
-    top: 8px;
-    right: 8px;
-
-    font-size: 12px;
-    padding: 4px 8px;
-
-    border: none;
-    border-radius: 4px;
-
-    background: #f3f3f3;
-    color: rgba(0, 0, 0, 0.35);
-
+    top: 10px;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    background: #f8f8f8;
+    color: #737373;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s;
+    transform: translateY(-2px);
+    transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
-pre[class*="language-"]:hover .copy-button {
+.code-block:hover .copy-button {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .copy-button:hover {
-    color: #000;
-    background: rgba(0, 0, 0, 0.04);
+    color: #111;
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.22);
+}
+
+.copy-button svg {
+    width: 15px;
+    height: 15px;
+}
+
+.copy-button .copied-icon {
+    display: none;
 }
 
 .copy-button.copied {
-    background: #d1fae5;
-    color: #000;
+    background: #e7f7ee;
+    border-color: #9dd6b4;
+    color: #18794e;
+}
+
+.copy-button.copied .copy-icon {
+    display: none;
+}
+
+.copy-button.copied .copied-icon {
+    display: inline-flex;
 }
 
 .post-body table {
