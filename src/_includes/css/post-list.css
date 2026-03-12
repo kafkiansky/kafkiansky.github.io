@@ -48,23 +48,24 @@
     color: #888;
 }
 
-.tutorial-badge {
+.post .tutorial-badge,
+.post .tutorial-badge:visited {
     display: inline-block;
     padding: 0.08em 0.55em;
-    border: 1px solid #d2c35b;
+    border: 1px solid #b99cff;
     border-radius: 3px;
-    background: #ece2a2;
-    color: #000;
+    background: #efe7ff;
+    color: #6d3de8 !important;
     text-decoration: none !important;
     font-size: 0.68rem;
     font-weight: 450;
     line-height: 1.2;
 }
 
-.tutorial-badge:hover {
-    border-color: #8d7f1f;
-    color: #000;
-    background: #e5d98e;
+.post .tutorial-badge:hover {
+    border-color: #9e7cf6;
+    color: #5d30cf !important;
+    background: #e5d8ff;
     text-decoration: none !important;
 }
 
