@@ -70,20 +70,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  document.querySelectorAll(".post-body h2[id], .post-body h3[id], .post-body h4[id]").forEach((heading) => {
+    if (heading.querySelector(".header-anchor")) return;
+    const link = document.createElement("a");
+    link.className = "header-anchor";
+    link.href = `#${heading.id}`;
+    link.setAttribute("aria-label", `Ссылка на раздел: ${heading.textContent}`);
+    link.textContent = "#";
+    heading.insertBefore(link, heading.firstChild);
+  });
+
   document.querySelectorAll("pre[class*='language-']").forEach((pre) => {
     const code = pre.querySelector("code");
     if (!code) return;
     if (pre.parentElement?.classList.contains("code-block")) return;
-
-    const raw = code.textContent ?? "";
-    const normalized = raw.endsWith("\n") ? raw.slice(0, -1) : raw;
-    const lineCount = Math.max(1, normalized.split("\n").length);
-    const lineNumbers = document.createElement("span");
-    lineNumbers.className = "code-line-numbers";
-    lineNumbers.setAttribute("aria-hidden", "true");
-    lineNumbers.textContent = Array.from({ length: lineCount }, (_, index) =>
-      String(index + 1)
-    ).join("\n");
 
     const button = document.createElement("button");
     button.className = "copy-button";
@@ -116,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     wrapper.className = "code-block";
     pre.parentNode?.insertBefore(wrapper, pre);
     wrapper.appendChild(pre);
-    wrapper.appendChild(lineNumbers);
     wrapper.appendChild(button);
   });
 

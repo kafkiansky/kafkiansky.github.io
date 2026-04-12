@@ -88,7 +88,6 @@ export default function (userOptions?: Options) {
                     code: "https://fonts.google.com/share?selection.family=JetBrains+Mono:ital,wght@0,100..800;1,100..800",
                     menu: "https://fonts.google.com/share?selection.family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700",
                     header: "https://fonts.google.com/share?selection.family=JetBrains+Mono:ital,wght@0,100..800;1,100..800",
-                    content: "https://fonts.google.com/share?selection.family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900"
                 },
             }))
             .add("fonts")
@@ -98,7 +97,7 @@ export default function (userOptions?: Options) {
             .add("favicon.png")
             .add("uploads")
             .mergeKey("extra_head", "stringArray")
-            .preprocess([".md"], (pages) => {
+            .preprocess([".md"], (pages: { data: Record<string, unknown> }[]) => {
                 for (const page of pages) {
                     page.data.excerpt ??= (page.data.content as string).split(
                         /<!--\s*more\s*-->/i,

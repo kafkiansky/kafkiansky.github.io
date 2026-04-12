@@ -16,29 +16,93 @@
 .post-details {
     display: flex;
     flex-flow: row wrap;
-    row-gap: 1em;
+    row-gap: 0.3em;
     column-gap: 0.5em;
     align-items: center;
-    font: var(--font-small);
-    color: var(--color-dim);
+    font-size: 15px;
+    color: var(--theme-muted);
+    margin-bottom: 1.5em;
 
     & p {
         margin: 0;
     }
 
     & p::after {
-        content: "•";
-        padding-left: 0.5em;
-        align-self: stretch;
+        content: "·";
+        padding-left: 0.6em;
+        color: var(--theme-muted);
     }
 
-    & p:last-of-type {
-        margin-right: 0.5em;
-
-        &::after {
-            display: none;
-        }
+    & p:last-of-type::after {
+        display: none;
     }
+}
+
+.toc {
+    margin: 0 0 2em;
+    padding: 0.8em 1em 0.9em;
+    border-left: 3px solid var(--theme-muted);
+    background: transparent;
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.toc h2 {
+    font-family: "PT Serif", serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--theme-muted);
+    margin: 0 0 0.5em;
+}
+
+.toc ol,
+.toc ul {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.toc > ol {
+    padding-left: 1.1em;
+}
+
+.toc li {
+    margin: 0.15em 0;
+    font-family: "PT Serif", serif;
+    color: var(--theme-text);
+}
+
+.toc a {
+    color: var(--post-link);
+    text-decoration: none;
+}
+
+.toc a:hover {
+    text-decoration: underline;
+}
+
+.post-body :is(h2, h3, h4) {
+    position: relative;
+}
+
+.post-body :is(h2, h3, h4) > .header-anchor {
+    position: absolute;
+    left: -0.9em;
+    color: var(--theme-muted);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    font-weight: 400;
+}
+
+.post-body :is(h2, h3, h4):hover > .header-anchor,
+.post-body :is(h2, h3, h4) > .header-anchor:focus {
+    opacity: 0.6;
+}
+
+.post-body :is(h2, h3, h4) > .header-anchor:hover {
+    opacity: 1;
 }
 
 .post-tags {
@@ -52,26 +116,48 @@
     display: inline-block;
 }
 
-.post p,
-.post-content p {
-    margin-bottom: 1.2em;
-    font-family: "content";
+.post-body,
+.post-body p,
+.post-body ul,
+.post-body ol,
+.post-body li,
+.post-body blockquote,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6 {
+    font-family: "PT Serif", serif !important;
     font-size: 19px;
+    line-height: 1.5;
+    letter-spacing: normal !important;
     color: var(--theme-text);
     font-weight: 400;
-    line-height: 1.58;
-    letter-spacing: 0.008em;
 }
 
-.post ul,
-.post ol,
-.post li {
-    font-family: "content";
-    font-size: 19px;
-    color: var(--theme-text);
-    font-weight: 400;
-    line-height: 1.58;
-    letter-spacing: 0.008em;
+.post-body p {
+    margin-bottom: 15px;
+}
+
+.post-body h2 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 1.5em 0 0.5em;
+}
+
+.post-body h3 {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 1.5em 0 0.5em;
+}
+
+.post-body h4 {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 1.5em 0 0.5em;
 }
 
 .post li::marker {
@@ -204,121 +290,106 @@ body.lightbox-open {
 }
 
 pre[class*="language-"],
-code[class*="language-"] {
-    background-color: var(--code-block-bg);
-    font-family: "code", monospace !important;
-    border: none;
+code[class*="language-"],
+pre[class*="language-"] code {
+    background: transparent !important;
+    border: none !important;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 0;
+    font-family: "code", monospace !important;
+    font-size: inherit;
+    line-height: 1.3;
+    font-weight: 400;
+    color: var(--theme-text);
     margin: 0;
-    overflow-x: auto;
-    line-height: 1.45;
-    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 pre[class*="language-"] {
     width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding: 0.8em 1em 0.8em 4rem !important;
+    padding: 0 !important;
     text-indent: 0 !important;
+    overflow-x: auto;
 }
 
-pre[class*="language-"]>code {
+pre[class*="language-"] > code {
     display: block;
     padding: 0 !important;
-    margin: 0 !important;
     text-indent: 0 !important;
-}
-
-pre[class*="language-"] code *,
-.line-numbers .line-numbers-rows,
-.line-highlight {
-    background: transparent;
-    border: none !important;
 }
 
 code {
-    background-color: var(--code-inline-bg);
-    padding: 0.1em 0.4em;
-    border-radius: 4px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
 }
 
-.post :not(pre)>code,
-.post-content :not(pre)>code {
-    background: transparent !important;
-    color: var(--theme-text) !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    font-size: 0.95em;
-}
-
-pre[class*="language-"],
-pre[class*="language-"] code {
-    background: var(--code-block-bg);
-    color: var(--code-block-text);
+pre[class*="language-"] .token,
+:not(pre) > code[class*="language-"] .token {
+    color: var(--theme-text);
 }
 
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-    color: var(--code-comment);
+    color: var(--code-comment) !important;
     font-style: italic;
 }
 
 .token.keyword,
 .token.control,
+.token.directive,
 .token.operator,
-.token.directive {
-    color: var(--code-keyword);
-    font-weight: 600;
+.token.selector,
+.token.atrule,
+.token.important {
+    color: var(--theme-text) !important;
+    font-weight: 700;
+}
+
+.token.class-name,
+.token.builtin,
+.token.constant,
+.token.symbol,
+.token.tag {
+    color: var(--code-class) !important;
+    font-weight: 700;
 }
 
 .token.function,
+.token.function-definition,
 .token.method {
-    color: var(--code-function) !important;
-    font-weight: 500;
-}
-
-.token.function-definition {
-    color: var(--code-function) !important;
-    font-weight: 600;
-}
-
-.token.class-name {
-    color: var(--code-class);
-    font-weight: 600;
-}
-
-.token.builtin {
-    color: var(--code-class);
-    font-weight: 500;
-}
-
-.token.variable,
-.token.parameter,
-.token.property {
-    color: var(--code-variable);
+    color: var(--theme-text) !important;
+    font-weight: 400;
 }
 
 .token.string,
 .token.char,
-.token.number {
-    color: var(--code-string);
-}
-
-.token.attr-value {
-    color: var(--code-string);
-}
-
-pre[class*="language-"] .token.comment {
-    background-color: transparent;
-    color: var(--code-comment);
+.token.attr-value,
+.token.regex,
+.token.url,
+.token.entity {
+    color: var(--code-string) !important;
     font-weight: 400;
-    line-height: 1.4;
+}
+
+.token.number,
+.token.boolean {
+    color: var(--code-number) !important;
+    font-weight: 400;
+}
+
+.token.variable,
+.token.parameter,
+.token.property,
+.token.punctuation,
+.token.attr-name,
+.token.namespace {
+    color: var(--theme-text) !important;
+    font-weight: 400;
 }
 
 pre[class*="language-diff"] .token.deleted-sign,
@@ -378,30 +449,9 @@ pre[class*="language-diff-"] .token.prefix {
 
 .code-block {
     position: relative;
-    width: calc(100% + 4rem);
-    margin-left: -2rem;
-    margin-right: -2rem;
-    overflow: hidden;
-    border-radius: 6px;
-}
-
-.code-line-numbers {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3rem;
-    padding: 0.8em 0.55rem 0.8em 0.35rem;
-    border-right: 1px solid var(--copy-btn-border);
-    color: var(--theme-muted);
-    font-family: "code", monospace;
-    font-size: 1em;
-    line-height: 1.45;
-    text-align: right;
-    white-space: pre;
-    user-select: none;
-    pointer-events: none;
-    overflow: hidden;
+    width: 100%;
+    margin: 0 0 1.2em;
+    border-radius: 3px;
 }
 
 @media (max-width: 900px) {
@@ -412,21 +462,6 @@ pre[class*="language-diff-"] .token.prefix {
         max-width: 100%;
         margin-left: 0;
         margin-right: 0;
-    }
-
-    .code-block {
-        width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    pre[class*="language-"] {
-        padding-left: 3.35rem !important;
-    }
-
-    .code-line-numbers {
-        width: 2.55rem;
-        padding-right: 0.45rem;
     }
 
     .image-lightbox-figure {
@@ -499,74 +534,28 @@ pre[class*="language-diff-"] .token.prefix {
 
 .post-body table {
     width: 100%;
-    margin-bottom: 25px;
-    font-family: "code", monospace;
+    margin: 0 0 1.5em;
     border-collapse: collapse;
+    background: transparent;
+    font-family: "code", monospace !important;
     font-size: 0.95em;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-    background-image:
-        repeating-linear-gradient(
-            to bottom,
-            var(--table-line) 0 18px,
-            transparent 18px 24px
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            var(--table-line) 0 18px,
-            transparent 18px 24px
-        ),
-        repeating-linear-gradient(
-            to right,
-            var(--table-line) 0 18px,
-            transparent 18px 24px
-        );
-    background-position:
-        left top,
-        right top,
-        left bottom;
-    background-repeat:
-        repeat-y,
-        repeat-y,
-        repeat-x;
-    background-size:
-        2px 24px,
-        2px 24px,
-        24px 2px;
 }
 
-.post-body thead {
-    background-color: transparent;
+.post-body thead,
+.post-body tbody,
+.post-body tr {
+    background: transparent !important;
 }
 
 .post-body th,
 .post-body td {
-    padding: 0.25em 0.55em;
+    padding: 0.4em 0.7em;
+    text-align: left;
     vertical-align: top;
-}
-
-.post-body tbody td + td {
-    border-left: none;
-    background-image: repeating-linear-gradient(
-        to bottom,
-        var(--table-line) 0 18px,
-        transparent 18px 24px
-    );
-    background-position: left top;
-    background-repeat: repeat-y;
-    background-size: 2px 24px;
-}
-
-.post-body thead th {
-    border-top: 2px solid var(--table-line);
-    border-bottom: 2px solid var(--table-line);
-    background-image: none;
-}
-
-.post-body thead th + th {
-    border-left: 2px solid var(--table-line);
-    background-image: none;
+    background: transparent;
+    font-family: "code", monospace !important;
+    font-weight: 400;
+    border: 2px solid var(--theme-text);
 }
 
 .post-series-nav {

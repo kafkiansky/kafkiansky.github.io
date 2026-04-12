@@ -8,23 +8,19 @@
 :root {
   --color-link: var(--color-base);
   --color-link-hover: var(--color-dim);
-  --font-body: "content";
-  --theme-bg: #FFFFFF;
+  --font-body: "PT Serif", serif;
+  --theme-bg: #fdfdfd;
   --theme-text: #111;
   --theme-muted: #888;
-  --post-link: #3366cc;
-  --post-link-hover: #000;
+  --post-link: #2a7ae2;
+  --post-link-hover: #111;
   --list-link-color: #000;
   --list-link-underline: #aaa;
-  --code-block-bg: #F7F9FB;
-  --code-block-text: #000;
-  --code-inline-bg: #d0f9df;
-  --code-comment: #6a737d;
-  --code-keyword: #d73a49;
-  --code-function: #6f42c1;
-  --code-class: #005cc5;
-  --code-variable: #24292e;
-  --code-string: #032f62;
+  --code-comment: #998;
+  --code-class: #458;
+  --code-function: #900;
+  --code-string: #d14;
+  --code-number: #099;
   --copy-btn-bg: #EDF2F6;
   --copy-btn-border: rgba(0, 0, 0, 0.12);
   --copy-btn-color: #737373;
@@ -34,7 +30,7 @@
   --copy-btn-done-bg: #e7f7ee;
   --copy-btn-done-border: #9dd6b4;
   --copy-btn-done-color: #18794e;
-  --table-line: #111;
+  --table-line: #e8e8e8;
   --tutorial-badge-bg: #efe7ff;
   --tutorial-badge-border: #b99cff;
   --tutorial-badge-text: #6d3de8;
@@ -52,15 +48,11 @@
     --post-link-hover: #d9e2ff;
     --list-link-color: #eef1f5;
     --list-link-underline: #6f7a86;
-    --code-block-bg: #1F2630;
-    --code-block-text: #e6edf3;
-    --code-inline-bg: #203145;
-    --code-comment: #8fa1b3;
-    --code-keyword: #ff7b8b;
-    --code-function: #c6a8ff;
+    --code-comment: #8a8f99;
     --code-class: #8ec1ff;
-    --code-variable: #e6edf3;
-    --code-string: #9ad0ff;
+    --code-function: #f08a8a;
+    --code-string: #f8b4b4;
+    --code-number: #7ed2c4;
     --copy-btn-bg: #273242;
     --copy-btn-border: rgba(255, 255, 255, 0.14);
     --copy-btn-color: #b3beca;
@@ -70,7 +62,7 @@
     --copy-btn-done-bg: #153327;
     --copy-btn-done-border: #2d7a54;
     --copy-btn-done-color: #7ee2aa;
-    --table-line: #cfd7df;
+    --table-line: #2a2f40;
     --tutorial-badge-bg: #2b2140;
     --tutorial-badge-border: #7654b8;
     --tutorial-badge-text: #d2befa;
@@ -88,15 +80,11 @@
   --post-link-hover: #d9e2ff;
   --list-link-color: #eef1f5;
   --list-link-underline: #6f7a86;
-  --code-block-bg: #1F2630;
-  --code-block-text: #e6edf3;
-  --code-inline-bg: #203145;
-  --code-comment: #8fa1b3;
-  --code-keyword: #ff7b8b;
-  --code-function: #c6a8ff;
+  --code-comment: #8a8f99;
   --code-class: #8ec1ff;
-  --code-variable: #e6edf3;
-  --code-string: #9ad0ff;
+  --code-function: #f08a8a;
+  --code-string: #f8b4b4;
+  --code-number: #7ed2c4;
   --copy-btn-bg: #273242;
   --copy-btn-border: rgba(255, 255, 255, 0.14);
   --copy-btn-color: #b3beca;
@@ -106,7 +94,7 @@
   --copy-btn-done-bg: #153327;
   --copy-btn-done-border: #2d7a54;
   --copy-btn-done-color: #7ee2aa;
-  --table-line: #cfd7df;
+  --table-line: #2a2f40;
   --tutorial-badge-bg: #2b2140;
   --tutorial-badge-border: #7654b8;
   --tutorial-badge-text: #d2befa;
@@ -121,10 +109,13 @@ html,
 body {
   background-color: var(--theme-bg) !important;
   font-weight: 400;
-  font-family: "content";
+  font-family: "PT Serif", serif;
   font-size: 19px;
-  line-height: 1.65;
-  letter-spacing: 0.008em;
+  line-height: 1.5;
+  letter-spacing: normal;
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
 }
 
 html {
