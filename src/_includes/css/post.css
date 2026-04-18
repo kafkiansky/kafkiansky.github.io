@@ -48,7 +48,7 @@
 }
 
 .toc h2 {
-    font-family: "PT Serif", serif;
+    font-family: "content", serif;
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
@@ -69,7 +69,7 @@
 
 .toc li {
     margin: 0.15em 0;
-    font-family: "PT Serif", serif;
+    font-family: "content", serif;
     color: var(--theme-text);
 }
 
@@ -127,7 +127,7 @@
 .post-body h4,
 .post-body h5,
 .post-body h6 {
-    font-family: "PT Serif", serif !important;
+    font-family: "content", serif !important;
     font-size: 19px;
     line-height: 1.5;
     letter-spacing: normal !important;
@@ -532,9 +532,16 @@ pre[class*="language-diff-"] .token.prefix {
     display: inline-flex;
 }
 
+.post-body .table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 0 0 1.5em;
+    -webkit-overflow-scrolling: touch;
+}
+
 .post-body table {
     width: 100%;
-    margin: 0 0 1.5em;
+    margin: 0;
     border-collapse: collapse;
     background: transparent;
     font-family: "code", monospace !important;
@@ -555,6 +562,9 @@ pre[class*="language-diff-"] .token.prefix {
     background: transparent;
     font-family: "code", monospace !important;
     font-weight: 400;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
     border: 2px solid var(--theme-text);
 }
 

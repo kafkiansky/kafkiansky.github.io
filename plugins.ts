@@ -85,6 +85,7 @@ export default function (userOptions?: Options) {
                 cssFile: "styles.css",
                 placeholder: "/* google-fonts */",
                 fonts: {
+                    content: "https://fonts.google.com/share?selection.family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700",
                     code: "https://fonts.google.com/share?selection.family=JetBrains+Mono:ital,wght@0,100..800;1,100..800",
                     menu: "https://fonts.google.com/share?selection.family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700",
                     header: "https://fonts.google.com/share?selection.family=JetBrains+Mono:ital,wght@0,100..800;1,100..800",

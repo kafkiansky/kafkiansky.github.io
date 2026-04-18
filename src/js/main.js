@@ -80,6 +80,15 @@ document.addEventListener("DOMContentLoaded", () => {
     heading.insertBefore(link, heading.firstChild);
   });
 
+  document.querySelectorAll(".post-body table").forEach((table) => {
+    if (table.parentElement?.classList.contains("table-scroll")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "table-scroll";
+    table.parentNode?.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+
   document.querySelectorAll("pre[class*='language-']").forEach((pre) => {
     const code = pre.querySelector("code");
     if (!code) return;
