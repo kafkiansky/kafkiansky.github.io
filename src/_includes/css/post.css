@@ -568,6 +568,19 @@ pre[class*="language-diff-"] .token.prefix {
     border: 2px solid var(--theme-text);
 }
 
+@media (max-width: 900px) {
+    .post-body .table-scroll table {
+        width: max-content;
+        min-width: 100%;
+        font-family: "content", serif !important;
+    }
+
+    .post-body .table-scroll th,
+    .post-body .table-scroll td {
+        font-family: "content", serif !important;
+    }
+}
+
 .post-series-nav {
   display: flex;
   margin: 0.6em 0 1.6em;
