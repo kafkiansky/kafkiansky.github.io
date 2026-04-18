@@ -563,7 +563,7 @@ pre[class*="language-diff-"] .token.prefix {
     font-family: "code", monospace !important;
     font-weight: 400;
     white-space: normal;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     word-break: normal;
     border: 2px solid var(--theme-text);
 }
