@@ -572,12 +572,6 @@ pre[class*="language-diff-"] .token.prefix {
     .post-body .table-scroll table {
         width: max-content;
         min-width: 100%;
-        font-family: "content", serif !important;
-    }
-
-    .post-body .table-scroll th,
-    .post-body .table-scroll td {
-        font-family: "content", serif !important;
     }
 }
 
