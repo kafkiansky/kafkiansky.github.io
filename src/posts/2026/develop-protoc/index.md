@@ -1,5 +1,6 @@
 ---
 title: Изобретая protoc
+description: В отличие от OpenAPI, сделавшего schema-first и code-first подходы одинаково популярными, в протобафе преобладает первый.
 author: kafkiansky
 date: 2026-05-06
 tags:
