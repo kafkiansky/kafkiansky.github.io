@@ -10,6 +10,9 @@ draft: false
 prev:
   title: Изобретая protobuf
   url: 2026/develop-protobuf
+next:
+  title: Изобретая protoc
+  url: 2026/develop-protoc
 tutorial:
   title: gRPC ecosystem
   href: /tutorials/grpc-ecosystem/
